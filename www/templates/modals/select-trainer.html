@@ -1,0 +1,18 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-calm-900">
+    <div class="title color-white">Choose Trainer</div>
+    <button class="button button-clear " ng-click="hideSettings()">
+      <i class="ion ion-close"></i>
+    </button>
+  </ion-header-bar>
+
+  <ion-content class="bg-color-stable">
+    <div class="list">
+      <a class="item item-avatar" ng-repeat="trainer in trainers " id="{{trainer.uid}}" ng-click="chooseUser(trainer)">
+        <img ng-src="{{trainer.photoURL}}" >
+        <h2>{{trainer.nickname}}</h2>
+      </a>
+    </div>
+
+  </ion-content>
+</ion-modal-view>

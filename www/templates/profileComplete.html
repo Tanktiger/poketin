@@ -1,0 +1,39 @@
+<ion-view view-title="Complete Profile">
+    <ion-content ng-class="{expanded:$scope.isExpanded}">
+        <h4 class="content padding double-padding-x">Needed User Account Data</h4>
+      <div class="list">
+        <label class="item item-input item-floating-label">
+          <span class="input-label">Pokemon Go Nickname</span>
+          <input type="text" ng-model="user.nickname" placeholder="Pokemon Go Nickname">
+        </label>
+        <label class="item item-input item-floating-label">
+          <span class="input-label">Level</span>
+          <input type="text" ng-model="user.level" placeholder="Level">
+        </label>
+        <br>
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Team
+          </div>
+          <select ng-model="user.team">
+            <option value="valor" >Valor</option>
+            <option value="mystic" >Mystic</option>
+            <option value="instinct" >Instinct</option>
+          </select>
+        </label>
+        <br>
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Language
+          </div>
+          <select ng-model="user.language">
+            <option value="de" >German</option>
+            <option value="en" >English</option>
+          </select>
+        </label>
+      </div>
+      <div class="padding">
+        <button ng-click="saveUser()" class="button button-full button-assertive ink">Save</button>
+      </div>
+    </ion-content>
+</ion-view>

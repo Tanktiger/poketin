@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="lib/robotodraft/robotodraft.css" rel="stylesheet">
+    <!--<link href="lib/framework7/1.4.2/css/framework7.material.min.css" rel="stylesheet">-->
+    <!--<link href="lib/framework7/1.4.2/css/framework7.material.colors.min.css" rel="stylesheet">-->
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="lib/hover-min.css" rel="stylesheet">
+    <link href="lib/ionic-material/dist/ionic.material.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/ionic-material/dist/ionic.material.min.js"></script>
+    <script src="lib/collide.js"></script>
+    <!--<script src="lib/ionic.tdcards2.js"></script>-->
+    <script src="lib/ion-tinder-cards.js"></script>
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="lib/ngCordova/dist/ng-cordova.js"></script>
+    <script src="cordova.js"></script>
+
+
+    <script src="lib/framework7/1.4.2/js/framework7.min.js"></script>
+    <script src="lib/hello.all.min.js"></script>
+    <script src="lib/angular-swiper.js"></script>
+    <script src="lib/underscore.min.js"></script>
+    <script src="lib/angular-filter.min.js"></script>
+    <script src="lib/firebase/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDJydy2iY-iJSNjm-9vcm0l_i31GUooAy8",
+        authDomain: "poketinder-5fa5b.firebaseapp.com",
+        databaseURL: "https://poketinder-5fa5b.firebaseio.com",
+        storageBucket: "poketinder-5fa5b.appspot.com"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script src="lib/angularfire/dist/angularfire.min.js"></script>
+    <script src="lib/moment/min/moment-with-locales.min.js"></script>
+    <script src="lib/angular-moment/angular-moment.min.js"></script>
+    <script src="lib/angular-monoelastic.js"></script>
+    <script src="lib/angular-hello.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/tinder-tabs.js"></script>
+    <script src="js/directives.js"></script>
+
+  </head>
+  <body ng-app="poketin">
+  <!--
+  The nav bar that will be updated as we navigate between views.
+-->
+  <!--<ion-nav-bar class="bar-calm-900" ng-class="{'hide': hideNavBar, expanded: isExpanded, 'has-header-fab-left': hasHeaderFabLeft, 'has-header-fab-right': hasHeaderFabRight}" align-title="left">-->
+    <!--<ion-nav-back-button class="no-text">-->
+    <!--</ion-nav-back-button>-->
+    <!--<ion-nav-buttons side="right" ng-class="{'hide': hideMenuButton}">-->
+      <!--<button class="button button-icon button-clear ion-android-more-vertical" menu-toggle="right">-->
+      <!--</button>-->
+    <!--</ion-nav-buttons>-->
+  <!--</ion-nav-bar>-->
+  <!--
+      The views will be rendered in the <ion-nav-view> directive below
+      Templates are in the /templates folder (but you could also
+      have templates inline in this html file if you'd like).
+    -->
+    <ion-nav-view></ion-nav-view>
+  <div id="fb-root"></div>
+  </body>
+</html>

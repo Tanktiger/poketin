@@ -1,0 +1,47 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-calm-900" ng-class="'bg-color-' + user.team">
+    <span class="left-buttons">
+        <button class="button button-icon button-clear ion-arrow-left-c"  ng-click="hideSettings()">
+        </button>
+    </span>
+    <div class="h1 title title-left color-white">Edit Info</div>
+  </ion-header-bar>
+
+  <ion-content class="bg-color-stable">
+    <div class="list">
+
+      <div class="row">
+        <div class="col ">
+          <div class="profile-edit-container">
+            <img class="img-rounded clip-top-right" ng-src="{{user.photoURL}}" alt="" width="100%"  ng-click="addPhoto()">
+            <img
+              ng-click="deletePhoto()"
+              ng-src="img/delete.png"
+              class="profile-edit"
+              width="25">
+          </div>
+        </div>
+      </div>
+
+        <div class="list list-borderless">
+          <label class="item item-input item-floating-label">
+            <span class="input-label bold">Level</span>
+            <input type="number" min="1" max="50" ng-model="user.level" placeholder="Level">
+          </label>
+          <br>
+          <label class="item item-input item-select">
+            <span class="input-label bold">
+              Language
+            </span>
+            <select ng-model="user.language">
+              <option value="de" >German</option>
+              <option value="en" >English</option>
+            </select>
+          </label>
+          <button class="button button-block button-calm ink" ng-click="saveProfile()" data-ink-color="#9DEAFF" data-ink-opacity="1">
+            Submit
+          </button>
+        </div>
+    </div>
+  </ion-content>
+</ion-modal-view>

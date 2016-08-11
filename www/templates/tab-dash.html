@@ -1,0 +1,141 @@
+<ion-view view-title="Tinder" hide-nav-bar="true">
+      <ion-header-bar align-title="center" class="bar-stable">
+
+        <div class="buttons" ng-click="slideTo(0)">
+          <button class="button button-clear icon ion-person animated {{slideIndex == 0 ? 'color-' + user.team : 'color-gray'}}"></button>
+        </div>
+        <h1 class="title {{slideIndex ==1 ? 'color-' + user.team  : 'color-gray'}}" ng-click="slideTo(1)">
+          <!--<img ng-src="img/tinder.png" class="header-logo">-->
+          Poketin
+        </h1>
+        <div class="buttons" ng-click="slideTo(2)">
+            <button class="button button-clear icon ion-chatbubbles animated {{slideIndex == 2 ? 'color-' + user.team  : 'color-gray'}}"></button>
+        </div>
+
+      </ion-header-bar>
+
+  <ion-slide-box on-slide-changed="slideHasChanged($index)" show-pager="false" active-slide="slideIndex" ion-slide-tabs>
+    <ion-slide on-drag-left="onRelease()" on-drag-right="onTouch()">
+      <ion-content>
+        <div class="profile-container">
+          <img ng-src="{{user.photoURL}}" class="profile-image" width="100">
+          <img
+            ng-click="showEditProfile()"
+            ng-src="img/edit.png"
+            class="profile-edit"
+            width="50">
+        </div>
+
+          <div class="text-center padding" style="margin-top:22px;">
+            <h3>{{user.nickname}}</h3>
+            <img ng-src="img/team-{{user.team}}.svg" class="user-profile-team-image">
+          </div>
+
+          <ion-list class="text-center uppercase">
+            <ion-item class="color-pastel-blue" style="top: 30px;" ng-click="showEditProfile()">
+              Edit Profile
+            </ion-item>
+            <ion-item class="color-gray" style="top: 30px;" ng-click="logout()">
+              Logout
+            </ion-item>
+            <ion-item class="color-red" style="top: 30px;" ng-click="deleteProfile()">
+              Delete Profile
+            </ion-item>
+            <ion-item class="color-red hide" style="top: 30px;" ng-click="showSettings(user.uid)">
+              Settings
+            </ion-item>
+          </ion-list>
+      </ion-content>
+    </ion-slide>
+
+    <ion-slide>
+
+          <div class="radar" ng-class="'bg-color-' + user.team" ng-if="!cards.active.length" ng-click="refreshCards()">
+            <img ng-src="{{user.photoURL}}" width="100" height="100">
+          </div>
+
+          <!-- *************************
+            TD Cards
+            - We start off with an ng-if so that the cards are not generated
+              unless $scope.cards is not 'null'
+          ************************* -->
+          <div ng-if="cards.active">
+            <td-cards delegate-handle="cards" on-touch="onTouch()" on-release="onRelease()" >
+              <td-card ng-style="$index > 3 &&  {'display':'none'}"
+                       ng-if="card.photoURL && card.photoURL != '' && card.nickname && card.nickname != ''"
+                       ng-repeat="card in cards.active"
+                       on-destroy="cardDestroyed($index)"
+                       on-swipe-left="cardSwipedLeft($index)"
+                       on-swipe-right="cardSwipedRight($index)"
+                       on-transition-left="cardSwipedLeft($index)" on-transition-right="cardSwipedRight($index)"
+                       ng-click="showProfile(card.uid)"
+                       >
+                <div class="image">
+                  <div class="no-text no">NOPE</div>
+                  <div class="yes-text yes">LIKE</div>
+                  <!-- *************************
+                    Discard
+                    - The card is removed from the deck and a fly away animation is triggered.
+                    - onClickTransitionOut is found in ionic.tdcards.js
+                    - Animation can be customized by changing defaults
+                  ************************* -->
+                  <!-- <div class="discard" ng-click="onClickTransitionOut(card)">DISCARD</div> -->
+                  <img ng-src="{{ card.photoURL }}">
+                  <div class="item" >
+                    <div class="row">
+                      <div class="col">
+                        <h2>{{ card.nickname }}</h2>
+                        <p class="color-gray">Level: {{card.level}}</p>
+                      </div>
+                      <div class="col">
+                        <img ng-src="img/team-{{card.team}}.svg" class="card-team-image">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td-card>
+              <!-- *************************
+                End Card
+                - 'drag' is set to false. The user cannot drag it.
+                - 'refreshCards()' reloads all cards that have NOT been discarded.
+              ************************* -->
+              <!--<td-card id="end-card" drag="false">-->
+                <!-- <div class="tinder-refresh-button" ng-click="refreshCards()"></div> -->
+                <!--<div class="disable-user-behavior">-->
+                  <!-- <div class="tinder-refresh-button" ng-click="refreshCards()"></div> -->
+                <!--</div>-->
+                <!-- <i class="icon ion-ios-refresh disable-user-behavior" ng-click="refreshCards()"></i> -->
+              <!--</td-card>-->
+            </td-cards>
+          </div>
+
+          <div class="tinder-buttons" ng-if="cards.active">
+              <div class="tinder-button  animated bounceIn" ng-click="like(false)"></div>
+              <div class="info" ng-click="showProfile(cards.visible.uid)"></div>
+              <div class="tinder-button  animated bounceIn" ng-click="like(true)"></div>
+          </div>
+    </ion-slide>
+
+    <ion-slide on-drag-left="onTouch()" on-drag-right="onRelease()">
+      <ion-content>
+
+        <button class="button button-fab button-fab-bottom-right button-balanced-900 pane"
+                nav-view="active" ng-click="startChat()" style="bottom: 25px;opacity: 1; transform: translate3d(0%, 0px, 0px);">
+          <i class="icon ion-plus"></i>
+        </button>
+
+        <ion-list ng-if="chats">
+            <ion-item class="item-light item-text-wrap item-avatar item-borderless item-icon-right"
+                      data-ng-repeat="chat in chats "
+                      style="overflow:hidden;" ui-sref="tab.chat-detail({'chatId': chat.cid})">
+              <img ng-src="{{chat.user.photoURL}}">
+              <h2 class="capitalize font-120">{{chat.user.nickname}}</h2>
+              <p class=" color-gray">{{chat.lastMessage}}</p>
+              <hr class="item-hr">
+            </ion-item>
+        </ion-list>
+
+      </ion-content>
+    </ion-slide>
+  </ion-slide-box>
+</ion-view>
