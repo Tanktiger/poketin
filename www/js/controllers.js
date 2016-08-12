@@ -828,7 +828,7 @@ angular.module('poketin.controllers', [])
       scroller.style.bottom = newFooterHeight + 'px';
     });
 
-    $scope.scrollToBottom = function () {
+    $scope.scrollResize = function () {
       $timeout(function() {
         keepKeyboardOpen();
         viewScroll.resize();
@@ -836,6 +836,12 @@ angular.module('poketin.controllers', [])
       }, 200);
     };
 
+    $scope.scrollToBottom = function () {
+      $timeout(function() {
+        keepKeyboardOpen();
+        viewScroll.scrollBottom(true);
+      }, 200);
+    };
     $scope.hideChat = function () {
       $state.go("tab.dash");
     };
