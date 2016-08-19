@@ -498,29 +498,30 @@ angular.module('poketin.controllers', [])
       }
     });
 
-    function checkIfChatIsAlreadyRendered(chatId) {
-      if ($scope.chats.length > 0) {
-
-        if (document.getElementById(chatId)) return true;
-
-        var alreadyRendered = false;
-
-        if ($scope.chats && $scope.chats[chatId] && $scope.chats[chatId].length > 0) {
-          alreadyRendered = true;
-        }
-
-        return alreadyRendered;
-
-      } else {
-        return false;
-      }
-    }
     // firebase.database().ref('users-chats/' + $scope.user.uid).on('child_removed', function (data) {
     //   console.log('chat child_removed');
     //   console.log(data.val());
     //   //add at the beginning
     //   $scope.chats.unshift(data.val());
     // });
+  }
+
+  function checkIfChatIsAlreadyRendered(chatId) {
+    if ($scope.chats.length > 0) {
+
+      if (document.getElementById(chatId)) return true;
+
+      var alreadyRendered = false;
+
+      if ($scope.chats && $scope.chats[chatId] && $scope.chats[chatId].length > 0) {
+        alreadyRendered = true;
+      }
+
+      return alreadyRendered;
+
+    } else {
+      return false;
+    }
   }
 
   function addChatByID(chatID) {
@@ -549,6 +550,8 @@ angular.module('poketin.controllers', [])
           template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
         });
 
+        //@TODO check if there is already a chat in scope.chats - if no we can create one - else we open the existing chat
+
         var date = new Date();
         var userData = {
           'date': date.getTime(),
@@ -562,7 +565,7 @@ angular.module('poketin.controllers', [])
           'nickname': otherUser.nickname,
           'photoURL': otherUser.photoURL
         };
-        console.log('You are sure');
+
         //get new chat id
         var newChatId = firebase.database().ref().child('chats').push().key;
         var chatData = {
@@ -574,6 +577,7 @@ angular.module('poketin.controllers', [])
           ]
         };
         var updates = {};
+
         //save chat
         updates['chats/' + newChatId] = chatData;
         //create our chat

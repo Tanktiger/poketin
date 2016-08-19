@@ -16,10 +16,11 @@ angular.module('poketin', ['ionic',
                           'firebase',
                           'ngCordova',
                           'angularMoment',
-                            'ngHello'
+                          'ngHello',
+                          'pascalprecht.translate'
               ])
 
-.run(function($ionicPlatform,  $rootScope) {
+.run(function($ionicPlatform,  $rootScope, $window) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -34,40 +35,40 @@ angular.module('poketin', ['ionic',
       StatusBar.styleDefault();
     }
 
-    if(window.plugins && window.plugins.AdMob) {
-      var admob_key = device.platform == "Android" ?
-        "ca-app-pub-6877983798700739/8079893604" : "ca-app-pub-6877983798700739/7940292805";
-      var admob = window.plugins.AdMob;
-      admob.createBannerView(
-        {
-          'publisherId': admob_key,
-          'adSize': admob.AD_SIZE.BANNER,
-          'bannerAtTop': false
-        },
-        function() {
-          admob.requestAd(
-            { 'isTesting': false },
-            function() {
-              admob.showAd(true);
-            },
-            function() { console.log('failed to request ad'); }
-          );
-        },
-        function() { console.log('failed to create banner view'); }
-      );
+    var admobid = {};
+    if( /(android)/i.test(navigator.userAgent) ) { // for android & amazon-fireos
+      admobid = {
+        banner: 'ca-app-pub-6877983798700739/8079893604' // or DFP format "/6253334/dfp_example_ad"
+        // interstitial: 'ca-app-pub-xxx/yyy'
+      };
+    } else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) { // for ios
+      admobid = {
+        banner: 'ca-app-pub-6877983798700739/7940292805' // or DFP format "/6253334/dfp_example_ad"
+        // interstitial: 'ca-app-pub-xxx/kkk'
+      };
+    // } else { // for windows phone
+    //   admobid = {
+    //     banner: 'ca-app-pub-xxx/zzz', // or DFP format "/6253334/dfp_example_ad"
+    //     interstitial: 'ca-app-pub-xxx/kkk'
+    //   };
     }
+
+    if(window.AdMob) window.AdMob.createBanner({
+      adId: admobid.banner,
+      position: window.AdMob.AD_POSITION.BOTTOM_CENTER,
+      autoShow: true });
 
   });
 })
 
-.config(function ($provide, $ionicConfigProvider, $compileProvider, helloProvider) {
+.config(function ($provide, $ionicConfigProvider, $compileProvider, helloProvider, $translateProvider) {
   $ionicConfigProvider.tabs.position('bottom');
-  // $translateProvider.useStaticFilesLoader({
-  //     prefix: 'l10n/',
-  //     suffix: '.json'
-  //   });
-  // $translateProvider.preferredLanguage("en");
-  // $translateProvider.fallbackLanguage("en");
+  $translateProvider.useStaticFilesLoader({
+      prefix: 'locale/',
+      suffix: '.json'
+    });
+  $translateProvider.preferredLanguage("en");
+  $translateProvider.fallbackLanguage("en");
   $ionicConfigProvider.scrolling.jsScrolling(false);
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|cdvfile|file|filesystem|blob):|data:image\//);
   $ionicConfigProvider.backButton.text(null).icon('ion-arrow-left-c color-coral');
@@ -79,10 +80,10 @@ angular.module('poketin', ['ionic',
     // redirect_uri: 'https://poketinder-5fa5b.firebaseapp.com/__/auth/handler',
     // redirect_uri: 'index.html',
     redirect_uri: 'http://localhost:8100/login',
+    // redirect_uri: '../index.html',
     scope: 'email'
   });
 })
-
 
 .config(function($stateProvider, $urlRouterProvider) {
 
@@ -172,4 +173,5 @@ angular.module('poketin', ['ionic',
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/login');
 
+  // $locationProvider.html5Mode({enabled: true, requireBase: false});
 });

@@ -1,0 +1,29 @@
+{
+  "button": {
+    "save": "Save"
+  },
+
+  "profile": {
+    "complete": {
+      "headline": "Needed User Account Data",
+      "nickname": "Pokemon Go Nickname",
+      "level": "Level",
+      "team": {
+        "valor": "Valor",
+        "mystic": "Mystic",
+        "instinct": "Instinct"
+      },
+      "language": "Language",
+      "languages": {
+        "ger": "German",
+        "eng": "English"
+      }
+    }
+  },
+
+  "chat": {
+    "detail": {
+      "write_message": "Write a message ..."
+    }
+  }
+}

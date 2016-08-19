@@ -57,7 +57,7 @@ angular.module('poketin.services', [])
     };
 
     service.getUser = function () {
-      return service.user;
+      return (service.user)? service.user: firebase.auth().currentUser;
     };
 
     service.checkAccountData = function () {
@@ -147,6 +147,7 @@ angular.module('poketin.services', [])
       service.user = null;
       firebase.auth().signOut();
       hello.logout();
+      window.localStorage.removeItem('hello'); //remove by hand because hello.logout does nothing :(
     }
   })
 

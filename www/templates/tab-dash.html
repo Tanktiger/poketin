@@ -15,6 +15,7 @@
       </ion-header-bar>
 
   <ion-slide-box on-slide-changed="slideHasChanged($index)" show-pager="false" active-slide="slideIndex" ion-slide-tabs>
+    <!-- Profile slide -->
     <ion-slide on-drag-left="onRelease()" on-drag-right="onTouch()">
       <ion-content>
         <div class="profile-container">
@@ -48,6 +49,7 @@
       </ion-content>
     </ion-slide>
 
+    <!-- tinder slide -->
     <ion-slide>
 
           <div class="radar" ng-class="'bg-color-' + user.team" ng-if="!cards.active.length" ng-click="refreshCards()">
@@ -116,6 +118,7 @@
           </div>
     </ion-slide>
 
+    <!-- chat slide -->
     <ion-slide on-drag-left="onTouch()" on-drag-right="onRelease()">
       <ion-content>
 
@@ -127,7 +130,8 @@
         <ion-list ng-if="chats">
             <ion-item class="item-light item-text-wrap item-avatar item-borderless item-icon-right"
                       data-ng-repeat="chat in chats "
-                      style="overflow:hidden;" ui-sref="tab.chat-detail({'chatId': chat.cid})">
+                      style="overflow:hidden;" ui-sref="tab.chat-detail({'chatId': chat.cid})"
+              id="{{chat.cid}}">
               <img ng-src="{{chat.user.photoURL}}">
               <h2 class="capitalize font-120">{{chat.user.nickname}}</h2>
               <p class=" color-gray">{{chat.lastMessage}}</p>

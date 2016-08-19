@@ -47,7 +47,7 @@
   <form name="sendMessageForm" ng-submit="sendMessage(sendMessageForm)" novalidate>
     <ion-footer-bar class="item-input-inset message-footer" keyboard-attach>
       <label class="item-input-wrapper message-box">
-        <textarea ng-model="input.message" ng-click="scrollToBottom()" class="message-box" value="" placeholder="Send {{toUser.username}} a message..." required minlength="1" maxlength="1500" msd-elastic></textarea>
+        <textarea ng-model="input.message" ng-click="scrollToBottom()" class="message-box" value="" placeholder="{{ 'chat.detail.write_message' | translate }}" required minlength="1" maxlength="1500" msd-elastic></textarea>
       </label>
       <div class="footer-btn-wrap">
         <button class="button button-clear button-balanced bg-color-darkgreen button-small footer-btn" type="submit"
