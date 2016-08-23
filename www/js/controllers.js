@@ -160,18 +160,40 @@ angular.module('poketin.controllers', [])
           var date = new Date();
 
           if (position) {
-            var longStart = position.coords.longitude - 10.1;
-            var longEnd = position.coords.longitude + 10.1;
-            var latStart = position.coords.latitude - 10.1;
-            var latEnd = position.coords.latitude + 10.1;
+            var lowLat, highLat, lowLong, highLong;
+            var point = new LatLon(position.coords.latitude, position.coords.longitude);
+            var points = {};
+            points.north = point.destinationPoint(100000, 0); //100km
+            points.east = point.destinationPoint(100000, 90);//100km
+            points.south = point.destinationPoint(100000, 180);//100km
+            points.west = point.destinationPoint(100000, 270); //100km
+            lowLat = point.lat;
+            highLat = point.lat;
+            lowLong = point.long;
+            highLong = point.long;
+            angular.forEach(points, function (point, dir) {
+                if (lowLat > point.lat ) lowLat = point.lat;
+                if (highLat < point.lat ) highLat = point.lat;
+                if (lowLong > point.long ) lowLat = point.long;
+                if (highLong < point.long ) lowLat = point.long;
+            });
+            console.info(position.coords, lowLat, highLat, lowLong, highLong);
+            //left = 270 degrees
+            //top = 0 degrees
+            //bottom = 180 degrees
+            //right = 90 degrees
+            // var longStart = position.coords.longitude - 0.5;
+            // var longEnd = position.coords.longitude + 0.5;
+            // var latStart = position.coords.latitude - 0.5;
+            // var latEnd = position.coords.latitude + 0.5;
 
-            console.info(position, longStart, longEnd, latStart, latEnd);
+            // console.info(position, longStart, longEnd, latStart, latEnd);
             $scope.cards.master = [];
 
             //@TODO: check if we need lastLong or if we put both variables in one
             firebase.database().ref('users')
               .orderByChild('lastLat')
-              .startAt(latStart).endAt(latEnd)
+              .startAt(lowLat).endAt(highLat)
               .once('value', function(snapshot) {
                 if (snapshot.exists()) {
                   // dont set if discard, like or dislike
@@ -198,7 +220,57 @@ angular.module('poketin.controllers', [])
                       });
                     } else {
                       snapshot.forEach(function (childsnapshot) {
+                        if (childsnapshot.key !== $scope.user.uid && !cardTypes[childsnapshot.key]) {
+                          cardTypes[childsnapshot.key] = childsnapshot.val();
+                          $scope.cards.master.push(childsnapshot.val());
+                        }
+                      });
+                    }
+                    $ionicLoading.hide();
+                    refreshCards();
+                  }, function () {
+                    //error
+                    $ionicLoading.hide();
+                  });
+                } else {
+                  //no user found - @TODO: show toast
+                  $ionicLoading.hide();
+                }
+              }, function () {
+                //error
+                $ionicLoading.hide();
+              });
+
+            firebase.database().ref('users')
+              .orderByChild('lastLong')
+              .startAt(lowLong).endAt(highLong)
+              .once('value', function(snapshot) {
+                if (snapshot.exists()) {
+                  // dont set if discard, like or dislike
+                  firebase.database().ref('users-likes/' + $scope.user.uid).once('value').then(function (data) {
+                    if (data.exists()) {
+                      snapshot.forEach(function (childsnapshot) {
+                        var add = true;
+
                         if (childsnapshot.key !== $scope.user.uid) {
+                          data.forEach(function (likeChildsnapshot) {
+                            //if user is in firebase we liked, disliked or discarded him
+                            if (childsnapshot.key == likeChildsnapshot.key) {
+                              add = false;
+                            }
+                          });
+
+                          if (add && !cardTypes[childsnapshot.key]) {
+                            var user = childsnapshot.val();
+                            cardTypes[childsnapshot.key] = user;
+                            $scope.cards.master.push(user);
+                          }
+                        }
+
+                      });
+                    } else {
+                      snapshot.forEach(function (childsnapshot) {
+                        if (childsnapshot.key !== $scope.user.uid && !cardTypes[childsnapshot.key]) {
                           cardTypes[childsnapshot.key] = childsnapshot.val();
                           $scope.cards.master.push(childsnapshot.val());
                         }
@@ -208,18 +280,19 @@ angular.module('poketin.controllers', [])
 
                     $ionicLoading.hide();
                     refreshCards();
+
                   }, function () {
                     //error
                     $ionicLoading.hide();
                   });
                 } else {
+                  //no user found - @TODO: show toast
                   $ionicLoading.hide();
                 }
               }, function () {
                 //error
                 $ionicLoading.hide();
               });
-
           } else {
             //@TODO: show popup that we cant find the position
             $ionicLoading.hide();
@@ -551,47 +624,61 @@ angular.module('poketin.controllers', [])
         });
 
         //@TODO check if there is already a chat in scope.chats - if no we can create one - else we open the existing chat
-
-        var date = new Date();
-        var userData = {
-          'date': date.getTime(),
-          'uid': $scope.user.uid,
-          'nickname': $scope.user.nickname,
-          'photoURL': $scope.user.photoURL
-        };
-        var otherUserData = {
-          'date': date.getTime(),
-          'uid': otherUser.uid,
-          'nickname': otherUser.nickname,
-          'photoURL': otherUser.photoURL
-        };
-
-        //get new chat id
-        var newChatId = firebase.database().ref().child('chats').push().key;
-        var chatData = {
-          'cid': newChatId,
-          'messages': [],
-          'private': true,
-          'users': [
-            otherUser.uid, $scope.user.uid
-          ]
-        };
-        var updates = {};
-
-        //save chat
-        updates['chats/' + newChatId] = chatData;
-        //create our chat
-        updates['users-chats/' + $scope.user.uid + '/' + newChatId] = otherUserData;
-        //create other user chat
-        updates['users-chats/' + otherUser.uid + '/' + newChatId] = userData;
-
-        //update all with one call
-        firebase.database().ref().update(updates).then(function () {
-          $scope.modalSettings.hide();
-          $ionicLoading.hide();
-          $state.go('tab.chat-detail', {'chatId': newChatId});
-          $cordovaToast.show("Started new chat", "short", "bottom");
+        var chatAlreadyExists = false;
+        angular.forEach($scope.chats, function (chat, chatId) {
+            if (chat.user.uid == otherUser.uid) {
+              $scope.modalSettings.hide();
+              $ionicLoading.hide();
+              $state.go('tab.chat-detail', {'chatId': chatId});
+              chatAlreadyExists = true;
+              return false;
+            }
         });
+
+        //if chat does not already exists - create a new one
+        if (!chatAlreadyExists) {
+          var date = new Date();
+          var userData = {
+            'date': date.getTime(),
+            'uid': $scope.user.uid,
+            'nickname': $scope.user.nickname,
+            'photoURL': $scope.user.photoURL
+          };
+          var otherUserData = {
+            'date': date.getTime(),
+            'uid': otherUser.uid,
+            'nickname': otherUser.nickname,
+            'photoURL': otherUser.photoURL
+          };
+
+          //get new chat id
+          var newChatId = firebase.database().ref().child('chats').push().key;
+          var chatData = {
+            'cid': newChatId,
+            'messages': [],
+            'private': true,
+            'users': [
+              otherUser.uid, $scope.user.uid
+            ]
+          };
+          var updates = {};
+
+          //save chat
+          updates['chats/' + newChatId] = chatData;
+          //create our chat
+          updates['users-chats/' + $scope.user.uid + '/' + newChatId] = otherUserData;
+          //create other user chat
+          updates['users-chats/' + otherUser.uid + '/' + newChatId] = userData;
+
+          //update all with one call
+          firebase.database().ref().update(updates).then(function () {
+            $scope.modalSettings.hide();
+            $ionicLoading.hide();
+            $state.go('tab.chat-detail', {'chatId': newChatId});
+            $cordovaToast.show("Started new chat", "short", "bottom");
+          });
+        }
+
       }
     });
 
