@@ -18,6 +18,7 @@ angular.module('poketin.controllers', [])
                                  , $cordovaCamera
                                  , $state
                                  , $cordovaToast
+                                 , $translate
 
 ) {
 
@@ -96,7 +97,7 @@ angular.module('poketin.controllers', [])
   }, 60000);
 
   $scope.$on('$ionicView.leave', function() {
-    console.log('leaving UserMessages view, destroying interval');
+    // console.log('leaving UserMessages view, destroying interval');
     // Make sure that the interval is destroyed
     if (angular.isDefined(updateUserPositionTimer)) {
       $interval.cancel(updateUserPositionTimer);
@@ -459,12 +460,12 @@ angular.module('poketin.controllers', [])
     });
   }
 
-  function showActionSheet() {
+  function showActionSheet(otherUser) {
 
       // Show the action sheet
       var hideSheet = $ionicActionSheet.show({
        buttons: [
-         { text: 'Unmatch Ben' }
+         { text: $translate.instant("match.buttons.unmatch") }
        ],
        cancelText: '<span class="color-white">Cancel</span>',
        cssClass: 'tinder-actionsheet',
@@ -472,9 +473,33 @@ angular.module('poketin.controllers', [])
             // add cancel code..
           },
        buttonClicked: function(index) {
+            unmatch(otherUser);
          return true;
        }
      });
+  }
+
+  function unmatch(otherUser) {
+    var updates = {};
+
+    //@TODO: delete match from likes? so they can re find and match again?
+    updates['users-matches/' + $scope.user.uid + '/' + otherUser.uid] = '';
+    updates['users-matches/' + otherUser.uid + '/' + $scope.user.uid] = '';
+
+    angular.forEach($scope.chats, function (chat, chatId) {
+      if (chat.user.uid == otherUser.uid) {
+        updates['chats/' + chatId] = '';
+      }
+    });
+
+
+    //update all with one call
+    firebase.database().ref().remove(updates);
+
+    //update of scope does firebase child_removed
+    //delete from friendlist
+    // delete $scope.trainers[otherUser.uid];
+
   }
 
   function showEditProfile() {
@@ -513,9 +538,9 @@ angular.module('poketin.controllers', [])
   function deleteProfile() {
     $ionicActionSheet.show({
       buttons: [
-        { text: 'Delete my account' }
+        { text: $translate.instant("profile.show.buttons.delete") }
       ],
-      cancelText: '<span class="color-white">Cancel</span>',
+      cancelText: '<span class="color-white">'+$translate.instant("button.cancel")+'</span>',
       cssClass: 'tinder-actionsheet',
       cancel: function() {
         // add cancel code..
@@ -523,7 +548,7 @@ angular.module('poketin.controllers', [])
       buttonClicked: function(index) {
         userService.removeUser();
         $state.go("login");
-        $cordovaToast.show("Profile deleted", "long", "bottom");
+
         return true;
       }
     });
@@ -547,7 +572,7 @@ angular.module('poketin.controllers', [])
   function getChats(){
     //add private chats
     firebase.database().ref('users-chats/' + $scope.user.uid).on('child_changed', function (data) {
-      console.log('chat child_changed');
+      // console.log('chat child_changed');
 
       if ($scope.chats.length > 0) {
         if (!checkIfChatIsAlreadyRendered(data.key)) {
@@ -561,8 +586,8 @@ angular.module('poketin.controllers', [])
     });
 
     firebase.database().ref('users-chats/' + $scope.user.uid).on('child_added', function (data) {
-      console.log('users-chats child_added');
-      console.log(data.val());
+      // console.log('users-chats child_added');
+      // console.log(data.val());
       var chatInfo = data.val();
       chatInfo.cid = data.key;
       //add at the beginning
@@ -571,12 +596,9 @@ angular.module('poketin.controllers', [])
       }
     });
 
-    // firebase.database().ref('users-chats/' + $scope.user.uid).on('child_removed', function (data) {
-    //   console.log('chat child_removed');
-    //   console.log(data.val());
-    //   //add at the beginning
-    //   $scope.chats.unshift(data.val());
-    // });
+    firebase.database().ref('users-chats/' + $scope.user.uid).on('child_removed', function (data) {
+      delete $scope.chats[data.key];
+    });
   }
 
   function checkIfChatIsAlreadyRendered(chatId) {
@@ -599,7 +621,7 @@ angular.module('poketin.controllers', [])
 
   function addChatByID(chatID) {
     firebase.database().ref('chats/' + chatID).once('value', function (data) {
-      console.log(data.val());
+      // console.log(data.val());
       //add at the beginning
       getChatOverviewDetails(data.val())
     });
@@ -675,7 +697,7 @@ angular.module('poketin.controllers', [])
             $scope.modalSettings.hide();
             $ionicLoading.hide();
             $state.go('tab.chat-detail', {'chatId': newChatId});
-            $cordovaToast.show("Started new chat", "short", "bottom");
+            $cordovaToast.show($translate.instant("toasts.chat.new"), "short", "bottom");
           });
         }
 
@@ -708,7 +730,7 @@ angular.module('poketin.controllers', [])
   function deletePhoto() {
     $scope.user.photoURL = 'img/profile_placeholder.png';
     userService.changeAvatar('img/profile_placeholder.png');
-    $cordovaToast.show("Picture deleted", "short", "bottom");
+
   }
 
   function checkIfAlreadyMatched(otherUserUid) {
@@ -724,7 +746,7 @@ angular.module('poketin.controllers', [])
   function logout() {
     userService.logout();
     $state.go("login");
-    $cordovaToast.show("Successfully logout", "short", "bottom");
+    $cordovaToast.show($translate.instant("toasts.logout"), "short", "bottom");
   }
 
   function getChatOverviewDetails(chat) {
@@ -1010,7 +1032,7 @@ angular.module('poketin.controllers', [])
       // var googleProvider = new firebase.auth.GoogleAuthProvider();
       // login(googleProvider);
       hello('google').login(function (r) {
-        console.log(r);
+        // console.log(r);
       });
     };
 
@@ -1018,7 +1040,7 @@ angular.module('poketin.controllers', [])
   $scope.loginWithFacebook = function loginWithFacebook() {
     console.log('loginWithFacebook');
     hello('facebook').login(function (r) {
-      console.log(r);
+      // console.log(r);
     });
     // $cordovaFacebook.login(["public_profile", "email", "user_friends"])
     //   .then(function(success) {
@@ -1029,7 +1051,7 @@ angular.module('poketin.controllers', [])
     //   });
   };
   hello.on("auth.login", function (r) {
-    console.log(r);
+    // console.log(r);
 
     if (r.authResponse && r.authResponse.access_token) {
       if (r.network && r.network == 'facebook') {
@@ -1085,7 +1107,7 @@ angular.module('poketin.controllers', [])
       // ...
       console.error(errorCode + ' : ' + errorMessage + ' - ' + credential);
       $ionicLoading.hide();
-      $cordovaToast.show("An error occured", "long", "bottom");
+      $cordovaToast.show($translate.instant("toasts.login.error"), "long", "bottom");
     });
 
     ionicMaterialInk.displayEffect();
@@ -1156,6 +1178,7 @@ angular.module('poketin.controllers', [])
                 lastActive: date.getTime()
               }).then(function () {
                 $ionicLoading.hide();
+                $translate.use($scope.user.language);
                 $state.go("tab.dash");
               });
 

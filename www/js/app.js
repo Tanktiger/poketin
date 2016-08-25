@@ -69,6 +69,7 @@ angular.module('poketin', ['ionic',
     });
   $translateProvider.preferredLanguage("en");
   $translateProvider.fallbackLanguage("en");
+  $translateProvider.forceAsyncReload(true);
   $ionicConfigProvider.scrolling.jsScrolling(false);
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|cdvfile|file|filesystem|blob):|data:image\//);
   $ionicConfigProvider.backButton.text(null).icon('ion-arrow-left-c color-coral');

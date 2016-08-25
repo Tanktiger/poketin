@@ -5,15 +5,15 @@
       <div id="search-container">
         <div id="search-bg" style="background-image: url('img/ben.png');"></div>
         <div id="search" style="height:{{deviceHeight}}px;">
-          <h1>Its a Match!</h1>
-          <p class="font-default">You and {{otherUser.nickname}} have liked each other</p>
+          <h1>{{ "match.title"|translate }}</h1>
+          <p class="font-default">{{ "match.text"|translate:'{ username: '+otherUser.nickname+' }' }}</p>
           <div class="text-center" style="margin-top:45px;">
             <img ng-src="{{user.photoURL}}" style="margin-right:10px;" height="130" width="130" class="img-matched animated bounceInLeft" alt="">
             <img ng-src="{{otherUser.photoURL}}" height="130" width="130" class="img-matched animated bounceInRight" alt="">
           </div>
           <div class="text-center match-buttons" >
-            <button ng-click="hideMatch();slideTo(2)" class="button button-block button-stable button-outline"><i class="ion-chatbubbles font-130"></i> Send Message</button>
-            <button ng-click="hideMatch()" class="button button-block button-stable button-outline" style="margin-top:17px;"><i class="ion-ios-browsers font-130"></i> Keep Playing</button>
+            <button ng-click="hideMatch();slideTo(2);" class="button button-block button-stable button-outline"><i class="ion-chatbubbles font-130"></i> {{ "match.buttons.send_message"|translate }}</button>
+            <button ng-click="hideMatch();" class="button button-block button-stable button-outline" style="margin-top:17px;"><i class="ion-ios-browsers font-130"></i>{{ "match.buttons.keep_playing"|translate }}</button>
           </div>
         </div>
       </div>

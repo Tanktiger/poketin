@@ -45,7 +45,7 @@ angular.module('poketin.services', [])
 })
 
 
-  .service('userService', function ($ionicPlatform, $cordovaGeolocation, $ionicLoading, $cordovaToast, hello) {
+  .service('userService', function ($ionicPlatform, $cordovaGeolocation, $ionicLoading, $cordovaToast, hello, $translate) {
     var service = this;
     service.user = null;
 
@@ -120,7 +120,8 @@ angular.module('poketin.services', [])
       firebase.database().ref('users/' + service.user.uid).update(data).then(function () {
         angular.extend(service.user, data);
         $ionicLoading.hide();
-        $cordovaToast.show("Profile updated", "short", "bottom");
+        $translate.use(service.user.language);
+        $cordovaToast.show($translate.instant("toasts.user.update"), "short", "bottom");
       });
 
     };
@@ -131,6 +132,7 @@ angular.module('poketin.services', [])
       });
       firebase.database().ref('users/' + service.user.uid).remove().then(function () {
         service.user = null;
+        $cordovaToast.show($translate.instant("toasts.user.delete"), "long", "bottom");
         $ionicLoading.hide();
       });
 
@@ -139,7 +141,7 @@ angular.module('poketin.services', [])
     service.changeAvatar = function (photoUrl) {
       firebase.database().ref('users/' + service.user.uid).update({photoURL: photoUrl}).then(function() {
         service.user.photoURL = photoUrl;
-        $cordovaToast.show("Picture changed", "short", "bottom");
+        $cordovaToast.show($translate.instant("toasts.user.picture_changed"), "short", "bottom");
       });
     };
 

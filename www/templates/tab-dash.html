@@ -5,8 +5,7 @@
           <button class="button button-clear icon ion-person animated {{slideIndex == 0 ? 'color-' + user.team : 'color-gray'}}"></button>
         </div>
         <h1 class="title {{slideIndex ==1 ? 'color-' + user.team  : 'color-gray'}}" ng-click="slideTo(1)">
-          <!--<img ng-src="img/tinder.png" class="header-logo">-->
-          Poketin
+          POKETIN
         </h1>
         <div class="buttons" ng-click="slideTo(2)">
             <button class="button button-clear icon ion-chatbubbles animated {{slideIndex == 2 ? 'color-' + user.team  : 'color-gray'}}"></button>
@@ -34,16 +33,16 @@
 
           <ion-list class="text-center uppercase">
             <ion-item class="color-pastel-blue" style="top: 30px;" ng-click="showEditProfile()">
-              Edit Profile
+              {{ "profile.show.buttons.edit"|translate }}
             </ion-item>
             <ion-item class="color-gray" style="top: 30px;" ng-click="logout()">
-              Logout
+              {{ "profile.show.buttons.logout"|translate }}
             </ion-item>
             <ion-item class="color-red" style="top: 30px;" ng-click="deleteProfile()">
-              Delete Profile
+              {{ "profile.show.buttons.delete"|translate }}
             </ion-item>
             <ion-item class="color-red hide" style="top: 30px;" ng-click="showSettings(user.uid)">
-              Settings
+              {{ "profile.show.buttons.settings"|translate }}
             </ion-item>
           </ion-list>
       </ion-content>
@@ -73,8 +72,8 @@
                        ng-click="showProfile(card.uid)"
                        >
                 <div class="image">
-                  <div class="no-text no">NOPE</div>
-                  <div class="yes-text yes">LIKE</div>
+                  <div class="no-text no"><i class="icon ion ion-thumbsdown"></i> </div>
+                  <div class="yes-text yes"><i class="icon ion ion-thumbsup"></i> </div>
                   <!-- *************************
                     Discard
                     - The card is removed from the deck and a fly away animation is triggered.
@@ -87,7 +86,7 @@
                     <div class="row">
                       <div class="col">
                         <h2>{{ card.nickname }}</h2>
-                        <p class="color-gray">Level: {{card.level}}</p>
+                        <p class="color-gray">{{ "card.level"|translate }}: {{card.level}}</p>
                       </div>
                       <div class="col">
                         <img ng-src="img/team-{{card.team}}.svg" class="card-team-image">

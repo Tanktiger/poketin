@@ -18,7 +18,7 @@
         <ion-item class="item-icon-right">
           <h2 class="font-130">{{ otherUser.nickname }}</h2>
           <p class="color-gray">Level: {{otherUser.level}}</p>
-          <i class="icon ion-android-more-vertical color-red bold" ng-click="showActionSheet()"></i>
+          <i class="icon ion-android-more-vertical color-red bold" ng-click="showActionSheet(otherUser)"></i>
         </ion-item>
         <ion-item >
           <img ng-src="img/team-{{otherUser.team}}.svg" class="user-profile-team-image">

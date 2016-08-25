@@ -1,6 +1,25 @@
 {
   "button": {
-    "save": "Save"
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+
+  "toasts": {
+    "user": {
+      "update": "Profile updated",
+      "picture_changed": "Picture updated",
+      "picture_deleted": "Picture deleted",
+      "delete": "Profile deleted"
+    },
+
+    "chat": {
+      "new": "Started new Chat"
+    },
+
+    "logout": "Successfull logout",
+    "login": {
+      "error": "An error occured"
+    }
   },
 
   "profile": {
@@ -9,6 +28,7 @@
       "nickname": "Pokemon Go Nickname",
       "level": "Level",
       "team": {
+        "label": "Team",
         "valor": "Valor",
         "mystic": "Mystic",
         "instinct": "Instinct"
@@ -18,6 +38,24 @@
         "ger": "German",
         "eng": "English"
       }
+    },
+
+    "edit": {
+      "level": "Level",
+      "language": "Language",
+      "languages": {
+        "ger": "German",
+        "eng": "English"
+      }
+    },
+
+    "show": {
+      "buttons": {
+        "edit": "Edit Profile",
+        "logout": "Logout",
+        "delete": "Delete Profile",
+        "settings": "Settings"
+      }
     }
   },
 
@@ -25,5 +63,23 @@
     "detail": {
       "write_message": "Write a message ..."
     }
+  },
+
+  "trainers": {
+    "select": "Choose a Trainer"
+  },
+
+  "match": {
+    "title": "Its a Match",
+    "text": "You and {{username}} have liked each other!",
+    "buttons": {
+      "send_message": "Send Message",
+      "keep_playing": "Keep Playing",
+      "unmatch": "Unmatch"
+    }
+  },
+
+  "card": {
+    "level": "Level"
   }
 }

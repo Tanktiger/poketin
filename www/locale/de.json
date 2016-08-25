@@ -1,0 +1,85 @@
+{
+  "button": {
+    "save": "Speichern",
+    "cancel": "Abrechen"
+  },
+
+  "toasts": {
+    "user": {
+      "update": "Profil gespeichert",
+      "picture_changed": "Bild aktualisiert",
+      "picture_deleted": "Bild gelöscht",
+      "delete": "Profil gelöscht"
+    },
+
+    "chat": {
+      "new": "Neuen Chat erstellt"
+    },
+
+    "logout": "Erfolgreich abgemeldet",
+    "login": {
+      "error": "Es ist ein Fehler aufgetreten"
+    }
+  },
+
+  "profile": {
+    "complete": {
+      "headline": "Benötigte Profilinformationen",
+      "nickname": "Pokemon Go Nickname",
+      "level": "Level",
+      "team": {
+        "label": "Team",
+        "valor": "Wagemut",
+        "mystic": "Weisheit",
+        "instinct": "Intuition"
+      },
+      "language": "Sprache",
+      "languages": {
+        "ger": "Deutsch",
+        "eng": "Englisch"
+      }
+    },
+
+    "edit": {
+      "level": "Level",
+      "language": "Sprache",
+      "languages": {
+        "ger": "Deutsch",
+        "eng": "Englisch"
+      }
+    },
+
+    "show": {
+      "buttons": {
+        "edit": "Profil editieren",
+        "logout": "Abmelden",
+        "delete": "Profil löschen",
+        "settings": "Einstellungen"
+      }
+    }
+  },
+
+  "chat": {
+    "detail": {
+      "write_message": "Schreibe eine Nachricht ..."
+    }
+  },
+
+  "trainers": {
+    "select": "Wähle einen Trainer"
+  },
+
+  "match": {
+    "title": "Ihr habt euch gefunden!",
+    "text": "Du und {{username}} findet euch gegenseitig interessant!",
+    "buttons": {
+      "send_message": "Sende Nachricht",
+      "keep_playing": "Weitersuchen",
+      "unmatch": "Entfernen"
+    }
+  },
+
+  "card": {
+    "level": "Level"
+  }
+}
