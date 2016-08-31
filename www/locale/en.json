@@ -9,7 +9,10 @@
       "update": "Profile updated",
       "picture_changed": "Picture updated",
       "picture_deleted": "Picture deleted",
-      "delete": "Profile deleted"
+      "delete": "Profile deleted",
+      "profile_complete": {
+        "error": "An error occured"
+      }
     },
 
     "chat": {
@@ -44,9 +47,10 @@
       "level": "Level",
       "language": "Language",
       "languages": {
-        "ger": "German",
-        "eng": "English"
-      }
+        "de": "German",
+        "en": "English"
+      },
+      "cropimage": "Crop Picture"
     },
 
     "show": {
@@ -54,7 +58,9 @@
         "edit": "Edit Profile",
         "logout": "Logout",
         "delete": "Delete Profile",
-        "settings": "Settings"
+        "settings": "Settings",
+        "addPhoto": "Camera",
+        "pickPhoto": "Gallery"
       }
     }
   },

@@ -517,20 +517,25 @@ td-cards {
 }
 
 td-card {
-  background: white;
+  background: transparent;
   margin-top: 70px;
   margin-left: 10px;
   margin-right: 10px;
-  width: 96%;
+  width: 98%;
   /*max-height: 320px !important;*/
   position:absolute;
   border-radius: 10px;
+}
+td-card .td-card {
+  width: 68%;
+  margin: 0 auto;
 }
 td-card .item{
   border-bottom-right-radius: 6px !important;
   border-bottom-left-radius: 6px !important;
   box-shadow: 0 8px 6px -6px #ccc;
   border-top: none;
+  background-color: white;
 }
 
 td-card img {
@@ -544,8 +549,8 @@ td-card img {
 
 .yes-text {
   position: absolute;
-  top: 35px;
-  left: 5px;
+  top: 0px;
+  left: 15%;
   font-size: 30px;
   color: #4CAF50;
   border: 2px solid #4CAF50;
@@ -557,8 +562,8 @@ td-card img {
 
 .no-text {
   position: absolute;
-  top: 35px;
-  right: 5px;
+  top: 0px;
+  right: 15%;
   font-size: 30px;
   color: #F44336;
   border: 2px solid #F44336;
@@ -1265,4 +1270,10 @@ td-card .card-team-image {
 }
 .shadow-normal {
   text-shadow: 3px 3px 5px #000000;
+}
+.cropArea {
+  background: #E4E4E4;
+  overflow: hidden;
+  width:300px;
+  height:300px;
 }

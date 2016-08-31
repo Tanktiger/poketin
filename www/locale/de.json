@@ -9,7 +9,10 @@
       "update": "Profil gespeichert",
       "picture_changed": "Bild aktualisiert",
       "picture_deleted": "Bild gelöscht",
-      "delete": "Profil gelöscht"
+      "delete": "Profil gelöscht",
+      "profile_complete": {
+        "error": "Es ist ein Fehler aufgetreten"
+      }
     },
 
     "chat": {
@@ -35,8 +38,8 @@
       },
       "language": "Sprache",
       "languages": {
-        "ger": "Deutsch",
-        "eng": "Englisch"
+        "de": "Deutsch",
+        "en": "Englisch"
       }
     },
 
@@ -46,7 +49,8 @@
       "languages": {
         "ger": "Deutsch",
         "eng": "Englisch"
-      }
+      },
+      "cropimage": "Bild zuschneiden"
     },
 
     "show": {
@@ -54,7 +58,9 @@
         "edit": "Profil editieren",
         "logout": "Abmelden",
         "delete": "Profil löschen",
-        "settings": "Einstellungen"
+        "settings": "Einstellungen",
+        "addPhoto": "Kamera",
+        "pickPhoto": "Gallerie"
       }
     }
   },

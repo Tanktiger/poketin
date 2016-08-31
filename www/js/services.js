@@ -6,6 +6,7 @@ angular.module('poketin.services', [])
   firebase.database().ref('users-chats/' + userService.getUser().uid).on('child_added', function(snapshot) {
     chats.unshift(snapshot.val());
   });
+
   firebase.database().ref('users-chats/' + userService.getUser().uid).on('child_changed', function(snapshot) {
     chats.push(snapshot.val());
     var add = true;
@@ -45,7 +46,7 @@ angular.module('poketin.services', [])
 })
 
 
-  .service('userService', function ($ionicPlatform, $cordovaGeolocation, $ionicLoading, $cordovaToast, hello, $translate) {
+.service('userService', function ($ionicPlatform, $cordovaGeolocation, $ionicLoading, $cordovaToast, hello, $translate) {
     var service = this;
     service.user = null;
 
@@ -58,6 +59,16 @@ angular.module('poketin.services', [])
 
     service.getUser = function () {
       return (service.user)? service.user: firebase.auth().currentUser;
+    };
+
+    service.refreshUser = function () {
+      firebase.database().ref('users/' + firebase.auth().currentUser.uid)
+        .once('value')
+        .then(function(snapshot) {
+          var data = snapshot.val();
+          service.user = data;
+          return data;
+      });
     };
 
     service.checkAccountData = function () {

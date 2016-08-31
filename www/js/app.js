@@ -17,7 +17,8 @@ angular.module('poketin', ['ionic',
                           'ngCordova',
                           'angularMoment',
                           'ngHello',
-                          'pascalprecht.translate'
+                          'pascalprecht.translate',
+                          'ngImgCrop'
               ])
 
 .run(function($ionicPlatform,  $rootScope, $window) {
@@ -122,6 +123,11 @@ angular.module('poketin', ['ionic',
       'tab-dash': {
         templateUrl: 'templates/tab-dash.html',
         controller: 'DashCtrl'
+      }
+    },
+    resolve: {
+      user: function (userService) {
+        return userService.refreshUser();
       }
     }
   })

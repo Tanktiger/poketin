@@ -19,6 +19,7 @@ angular.module('poketin.controllers', [])
                                  , $state
                                  , $cordovaToast
                                  , $translate
+                                 , $cordovaImagePicker
 
 ) {
 
@@ -32,7 +33,7 @@ angular.module('poketin.controllers', [])
   $scope.showActionSheet = showActionSheet;
   $scope.slideTo = slideTo;
   $scope.deleteProfile = deleteProfile;
-  $scope.addPhoto = addPhoto;
+  $scope.changePhoto = changePhoto;
   $scope.deletePhoto = deletePhoto;
   $scope.startChat = startChat;
   $scope.checkIfAlreadyMatched = checkIfAlreadyMatched;
@@ -164,25 +165,41 @@ angular.module('poketin.controllers', [])
             var lowLat, highLat, lowLong, highLong;
             var point = new LatLon(position.coords.latitude, position.coords.longitude);
             var points = {};
+
             points.north = point.destinationPoint(100000, 0); //100km
             points.east = point.destinationPoint(100000, 90);//100km
             points.south = point.destinationPoint(100000, 180);//100km
             points.west = point.destinationPoint(100000, 270); //100km
+
             lowLat = point.lat;
             highLat = point.lat;
-            lowLong = point.long;
-            highLong = point.long;
+            lowLong = point.lon;
+            highLong = point.lon;
+
             angular.forEach(points, function (point, dir) {
                 if (lowLat > point.lat ) lowLat = point.lat;
                 if (highLat < point.lat ) highLat = point.lat;
-                if (lowLong > point.long ) lowLat = point.long;
-                if (highLong < point.long ) lowLat = point.long;
+                if (lowLong > point.lon ) lowLong = point.lon;
+                if (highLong < point.lon ) highLong = point.lon;
             });
             console.info(position.coords, lowLat, highLat, lowLong, highLong);
             //left = 270 degrees
             //top = 0 degrees
             //bottom = 180 degrees
             //right = 90 degrees
+            if (lowLat == undefined) {
+              lowLat = position.coords.latitude - 0.5;
+            }
+            if (highLat == undefined) {
+              highLat = position.coords.latitude + 0.5;
+            }
+            if (lowLong == undefined) {
+              lowLong = position.coords.longitude - 0.5;
+            }
+            if (highLong == undefined) {
+              highLong = position.coords.longitude + 0.5;
+            }
+            console.info(lowLat, highLat, lowLong, highLong);
             // var longStart = position.coords.longitude - 0.5;
             // var longEnd = position.coords.longitude + 0.5;
             // var latStart = position.coords.latitude - 0.5;
@@ -706,6 +723,28 @@ angular.module('poketin.controllers', [])
 
   }
 
+  function changePhoto() {
+    $ionicActionSheet.show({
+      buttons: [
+        { text: $translate.instant("profile.show.buttons.addPhoto") },
+        { text: $translate.instant("profile.show.buttons.pickPhoto") }
+      ],
+      cancelText: '<span class="color-white">'+$translate.instant("button.cancel")+'</span>',
+      cssClass: 'tinder-actionsheet',
+      cancel: function() {
+        // add cancel code..
+      },
+      buttonClicked: function(index) {
+        if (index == 0) {
+          addPhoto();
+        } else {
+          pickPhoto();
+        }
+
+        return true;
+      }
+    });
+  }
   function addPhoto() {
     var options = {
       quality : 75,
@@ -714,8 +753,8 @@ angular.module('poketin.controllers', [])
       allowEdit : true,
       encodingType: Camera.EncodingType.JPEG,
       popoverOptions: CameraPopoverOptions,
-      targetWidth: 400,
-      targetHeight: 400,
+      targetWidth: 500,
+      targetHeight: 500,
       saveToPhotoAlbum: false
     };
     $cordovaCamera.getPicture(options).then(function(imageData) {
@@ -725,6 +764,48 @@ angular.module('poketin.controllers', [])
       //@TODO error handling
       console.error(error);
     });
+  }
+
+  function pickPhoto() {
+    var options = {
+      maximumImagesCount: 1,
+      width: 500,
+      height: 500,
+      quality: 80
+    };
+    $cordovaImagePicker.getPictures(options)
+      .then(function (results) {
+        for (var i = 0; i < results.length; i++) {
+          var image = results[i];
+          $ionicModal.fromTemplateUrl('templates/modals/crop-image.html', {
+            scope: $scope,
+            animation: 'slide-in-up',
+            hideDelay:920
+          }).then(function(modal, image) {
+            $scope.modalSettings = modal;
+            $scope.modalSettings.show();
+            $scope.myImage='';
+            $scope.myCroppedImage='';
+
+            window.plugins.Base64.encodeFile(image, function(base64){
+              $scope.myImage = base64;
+            });
+
+            $scope.hide = function () {
+              $scope.modalSettings.hide();
+            };
+
+            $scope.save = function () {
+              $scope.user.photoURL = $scope.myCroppedImage;
+              userService.changeAvatar($scope.user.photoURL);
+              $scope.modalSettings.hide();
+            };
+
+          });
+        }
+      }, function(error) {
+        // error getting photos
+      });
   }
 
   function deletePhoto() {
@@ -777,7 +858,6 @@ angular.module('poketin.controllers', [])
         chatOverviewDetails.user = snapshot.val();
         $scope.chats[chat.cid] = chatOverviewDetails;
         // $scope.chats.unshift(chatOverviewDetails);
-        console.log($scope.chats);
       }
     });
   }
@@ -1114,11 +1194,13 @@ angular.module('poketin.controllers', [])
   }
   })
 
-.controller('ProfileCompleteCtrl', function($scope, $state, $stateParams, $timeout, $cordovaGeolocation, $ionicPlatform, $ionicHistory, ionicMaterialMotion, ionicMaterialInk, userService, $ionicLoading) {
+.controller('ProfileCompleteCtrl', function($scope, $state, $stateParams,$cordovaToast, $translate, $timeout, $cordovaGeolocation, $ionicPlatform, $ionicHistory, ionicMaterialMotion, ionicMaterialInk, userService, $ionicLoading) {
 
   // Set Header
     $scope.user = userService.getUser();
     $scope.user.language = 'en';
+    $scope.user.team = "valor";
+
     // Set Motion
     $timeout(function() {
       ionicMaterialMotion.slideUp({
@@ -1175,7 +1257,8 @@ angular.module('poketin.controllers', [])
                 },
                 lastLat: lat,
                 lastLong: long,
-                lastActive: date.getTime()
+                lastActive: date.getTime(),
+                beta:true
               }).then(function () {
                 $ionicLoading.hide();
                 $translate.use($scope.user.language);
@@ -1184,6 +1267,8 @@ angular.module('poketin.controllers', [])
 
             }, function (err) {
               // error
+              $ionicLoading.hide();
+              $cordovaToast.show($translate.instant("toasts.user.profile_complete.error"), "long", "bottom");
             });
         });
     }

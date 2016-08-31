@@ -1,0 +1,19 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-calm-900">
+    <div class="title color-white">{{ "profile.edit.cropimage"|translate }}</div>
+    <button class="button button-clear " ng-click="hide()">
+      <i class="ion ion-close"></i>
+    </button>
+  </ion-header-bar>
+
+  <ion-content class="bg-color-stable">
+    <div class="cropArea">
+      <img-crop image="myImage" result-image-format="image/jpeg" result-image-size="500" result-image="myCroppedImage"></img-crop>
+    </div>
+    <div class="bar bar-footer">
+      <button class="button button-clear pull-left" ng-click="hide()">Cancel</button>
+      <button class="button button-clear pull-right" ng-click="save()">Save</button>
+    </div>
+  </ion-content>
+
+</ion-modal-view>
