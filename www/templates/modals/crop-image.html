@@ -1,5 +1,5 @@
 <ion-modal-view>
-  <ion-header-bar class="bar-calm-900">
+  <ion-header-bar class="bar-calm-900" ng-class="'bg-color-' + user.team">
     <div class="title color-white">{{ "profile.edit.cropimage"|translate }}</div>
     <button class="button button-clear " ng-click="hide()">
       <i class="ion ion-close"></i>
@@ -8,11 +8,26 @@
 
   <ion-content class="bg-color-stable">
     <div class="cropArea">
-      <img-crop image="myImage" result-image-format="image/jpeg" result-image-size="500" result-image="myCroppedImage"></img-crop>
+      <!--<img-crop image="myImage"-->
+                <!--result-image-format="image/jpeg"-->
+                <!--change-on-fly="true"-->
+                <!--area-type="square"-->
+                <!--area-min-size="200"-->
+                <!--result-image-size="400"-->
+                <!--result-image="myCroppedImage">-->
+      <!--</img-crop>-->
+      <image-crop
+        data-height="300"
+        data-width="300"
+        data-shape="square"
+        data-step="crop.imageCropStep"
+        src="crop.myImageForCropping"
+        data-result="crop.myCroppedImage"
+        max-size="500"
+      ></image-crop>
     </div>
-    <div class="bar bar-footer">
-      <button class="button button-clear pull-left" ng-click="hide()">Cancel</button>
-      <button class="button button-clear pull-right" ng-click="save()">Save</button>
+    <div class="bar bar-footer" ng-class="'bg-color-' + user.team">
+      <button class="button button-clear pull-right" ng-click="save()">{{ "button.save"|translate }}</button>
     </div>
   </ion-content>
 

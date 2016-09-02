@@ -18,7 +18,7 @@ angular.module('poketin', ['ionic',
                           'angularMoment',
                           'ngHello',
                           'pascalprecht.translate',
-                          'ngImgCrop'
+                          'ImageCropper'
               ])
 
 .run(function($ionicPlatform,  $rootScope, $window) {

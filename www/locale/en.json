@@ -8,6 +8,7 @@
     "user": {
       "update": "Profile updated",
       "picture_changed": "Picture updated",
+      "picture_changed_error": "Error while updating picture",
       "picture_deleted": "Picture deleted",
       "delete": "Profile deleted",
       "profile_complete": {
@@ -38,12 +39,13 @@
       },
       "language": "Language",
       "languages": {
-        "ger": "German",
-        "eng": "English"
+        "de": "German",
+        "en": "English"
       }
     },
 
     "edit": {
+      "title": "Edit Info",
       "level": "Level",
       "language": "Language",
       "languages": {

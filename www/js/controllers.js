@@ -535,6 +535,7 @@ angular.module('poketin.controllers', [])
 
       $scope.saveProfile = function () {
         userService.updateUser($scope.user);
+        $scope.modalSettings.hide();
       }
     });
   }
@@ -778,31 +779,42 @@ angular.module('poketin.controllers', [])
       .then(function (results) {
         for (var i = 0; i < results.length; i++) {
           var image = results[i];
-          $ionicModal.fromTemplateUrl('templates/modals/crop-image.html', {
-            scope: $scope,
-            animation: 'slide-in-up',
-            hideDelay:920
-          }).then(function(modal, image) {
-            $scope.modalSettings = modal;
-            $scope.modalSettings.show();
-            $scope.myImage='';
-            $scope.myCroppedImage='';
-
-            window.plugins.Base64.encodeFile(image, function(base64){
-              $scope.myImage = base64;
-            });
-
-            $scope.hide = function () {
-              $scope.modalSettings.hide();
-            };
-
-            $scope.save = function () {
-              $scope.user.photoURL = $scope.myCroppedImage;
-              userService.changeAvatar($scope.user.photoURL);
-              $scope.modalSettings.hide();
-            };
-
+          // crop.myImageForCropping='';
+          window.plugins.Base64.encodeFile(image, function(base64){
+            // crop.myImageForCropping = base64;
+            $scope.user.photoURL = base64;
+            userService.changeAvatar($scope.user.photoURL);
           });
+
+          //macht nur probleme
+          // $ionicModal.fromTemplateUrl('templates/modals/crop-image.html', {
+          //   // scope: $scope,
+          //   animation: 'slide-in-up',
+          //   hideDelay:920
+          // }).then(function(modal) {
+          //   $scope.modalSettings = modal;
+          //   $scope.modalSettings.show();
+          //   $scope.crop = crop;
+          //   $scope.crop.imageCropStep = 1;
+          //   $scope.crop.myCroppedImage='';
+          //
+          //   $scope.hide = function () {
+          //     $scope.modalSettings.hide();
+          //   };
+          //
+          //   $scope.save = function () {
+          //     console.log($scope.crop.myCroppedImage);
+          //     if ($scope.crop.myCroppedImage != '') {
+          //       $scope.user.photoURL = $scope.crop.myCroppedImage;
+          //       userService.changeAvatar($scope.user.photoURL);
+          //       $scope.modalSettings.hide();
+          //     } else {
+          //       $cordovaToast.show($translate.instant("toasts.user.picture_changed_error"), "short", "bottom");
+          //       $scope.modalSettings.hide();
+          //     }
+          //   };
+          //
+          // });
         }
       }, function(error) {
         // error getting photos

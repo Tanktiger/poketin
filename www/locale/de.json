@@ -8,6 +8,7 @@
     "user": {
       "update": "Profil gespeichert",
       "picture_changed": "Bild aktualisiert",
+      "picture_changed_error": "Bild konnte nicht aktualisiert werden",
       "picture_deleted": "Bild gelöscht",
       "delete": "Profil gelöscht",
       "profile_complete": {
@@ -44,11 +45,12 @@
     },
 
     "edit": {
+      "title": "Profil editieren",
       "level": "Level",
       "language": "Sprache",
       "languages": {
-        "ger": "Deutsch",
-        "eng": "Englisch"
+        "de": "Deutsch",
+        "en": "Englisch"
       },
       "cropimage": "Bild zuschneiden"
     },
