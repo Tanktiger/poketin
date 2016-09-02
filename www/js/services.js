@@ -62,7 +62,7 @@ angular.module('poketin.services', [])
     };
 
     service.refreshUser = function () {
-      firebase.database().ref('users/' + firebase.auth().currentUser.uid)
+      return firebase.database().ref('users/' + firebase.auth().currentUser.uid)
         .once('value')
         .then(function(snapshot) {
           var data = snapshot.val();
@@ -164,7 +164,7 @@ angular.module('poketin.services', [])
     }
   })
 
-  .factory('userFactory', function ($ionicPlatform) {
+  .factory('userFactory', function () {
     var service = this;
 
     service.getUserByUid = function (uid) {

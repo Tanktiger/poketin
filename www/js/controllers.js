@@ -20,6 +20,7 @@ angular.module('poketin.controllers', [])
                                  , $cordovaToast
                                  , $translate
                                  , $cordovaImagePicker
+                                 , $templateCache
 
 ) {
 
@@ -140,12 +141,12 @@ angular.module('poketin.controllers', [])
   });
 
   $scope.cardSwipedLeft = function(index) {
-    console.log('LEFT SWIPE');
+    // console.log('LEFT SWIPE');
     saveDislike(index);
   };
 
   $scope.cardSwipedRight = function(index) {
-    console.log('RIGHT SWIPE');
+    // console.log('RIGHT SWIPE');
     saveLike(index);
   };
 
@@ -825,6 +826,7 @@ angular.module('poketin.controllers', [])
   }
 
   function logout() {
+    $templateCache.removeAll();
     userService.logout();
     $state.go("login");
     $cordovaToast.show($translate.instant("toasts.logout"), "short", "bottom");
@@ -1105,12 +1107,10 @@ angular.module('poketin.controllers', [])
   };
 })
 
-.controller('LoginCtrl', function($scope, $timeout, $stateParams, ionicMaterialInk, $cordovaToast, $state, userService, $ionicLoading, $ionicPlatform, $ionicHistory) {
+.controller('LoginCtrl', function($scope, $timeout, $stateParams, amMoment, $translate, ionicMaterialInk, $cordovaToast, $state, userService, $ionicLoading, $ionicPlatform, $ionicHistory) {
     $scope.hideNavBar = true;
     $scope.hideMenuButton = true;
     $scope.loginWithGoogle = function loginWithGoogle() {
-      // var googleProvider = new firebase.auth.GoogleAuthProvider();
-      // login(googleProvider);
       hello('google').login(function (r) {
         // console.log(r);
       });
@@ -1119,16 +1119,8 @@ angular.module('poketin.controllers', [])
   //https://firebase.google.com/docs/auth/web/facebook-login
   $scope.loginWithFacebook = function loginWithFacebook() {
     console.log('loginWithFacebook');
-    hello('facebook').login(function (r) {
-      // console.log(r);
-    });
-    // $cordovaFacebook.login(["public_profile", "email", "user_friends"])
-    //   .then(function(success) {
-    //     var credential = firebase.auth.FacebookAuthProvider.credential(success.token);
-    //     login(credential);
-    //   }, function (error) {
-    //     // error
-    //   });
+    hello('facebook').login(function (r) {});
+
   };
   hello.on("auth.login", function (r) {
     // console.log(r);
@@ -1151,15 +1143,11 @@ angular.module('poketin.controllers', [])
       template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
     });
     firebase.auth().signInWithCredential(credential).then(function (result) {
-      console.log(result);
+      // console.log(result);
       // This gives you a Google Access Token. You can use it to access the Google API.
       // var token = result.credential.accessToken;
       // The signed-in user info.
-      var user = result.user; //firebase user - can we get everytime with firebase.auth().currentUser
-
-      //@TODO: set moment js locale
-      // amMoment.changeLocale('de');
-      //@TODO: set angular translate locale
+      // var user = result.user; //firebase user - can we get everytime with firebase.auth().currentUser
 
       userService.checkAccountData().then(function (result) {
         //clear history so back button will not bring us back
@@ -1168,24 +1156,33 @@ angular.module('poketin.controllers', [])
 
         if (result) {
           $ionicPlatform.ready(function() {
+            var user = userService.getUser();
+
+            amMoment.changeLocale(user.language);
+            $translate.use(user.language);
+            if(!$scope.$$phase) {
+              $scope.$apply();
+            }
             $state.go("tab.dash");
           });
         } else {
-          $state.go("profilecomplete");
+          $ionicPlatform.ready(function() {
+            $state.go("profilecomplete");
+          });
         }
       });
 
       // ...
     }).catch(function (error) {
       // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
+      // var errorCode = error.code;
+      // var errorMessage = error.message;
       // The email of the user's account used.
-      var email = error.email;
+      // var email = error.email;
       // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
+      // var credential = error.credential;
       // ...
-      console.error(errorCode + ' : ' + errorMessage + ' - ' + credential);
+      // console.error(errorCode + ' : ' + errorMessage + ' - ' + credential);
       $ionicLoading.hide();
       $cordovaToast.show($translate.instant("toasts.login.error"), "long", "bottom");
     });
@@ -1194,7 +1191,7 @@ angular.module('poketin.controllers', [])
   }
   })
 
-.controller('ProfileCompleteCtrl', function($scope, $state, $stateParams,$cordovaToast, $translate, $timeout, $cordovaGeolocation, $ionicPlatform, $ionicHistory, ionicMaterialMotion, ionicMaterialInk, userService, $ionicLoading) {
+.controller('ProfileCompleteCtrl', function($scope, $state, $stateParams, amMoment, $cordovaToast, $translate, $timeout, $cordovaGeolocation, $ionicPlatform, $ionicHistory, ionicMaterialMotion, ionicMaterialInk, userService, $ionicLoading) {
 
   // Set Header
     $scope.user = userService.getUser();
@@ -1261,7 +1258,10 @@ angular.module('poketin.controllers', [])
                 beta:true
               }).then(function () {
                 $ionicLoading.hide();
+
                 $translate.use($scope.user.language);
+                amMoment.changeLocale($scope.user.language);
+
                 $state.go("tab.dash");
               });
 

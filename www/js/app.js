@@ -124,11 +124,6 @@ angular.module('poketin', ['ionic',
         templateUrl: 'templates/tab-dash.html',
         controller: 'DashCtrl'
       }
-    },
-    resolve: {
-      user: function (userService) {
-        return userService.refreshUser();
-      }
     }
   })
   .state('tab.dash-match', {
