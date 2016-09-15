@@ -1,26 +1,29 @@
 angular.module('poketin.services', [])
 
-.factory('Chats', function(userService, $firebaseArray) {
+.factory('Chats', function(userService, $firebaseArray, $localStorage) {
   var chats = [];
 
   firebase.database().ref('users-chats/' + userService.getUser().uid).on('child_added', function(snapshot) {
     chats.unshift(snapshot.val());
+    $localStorage.chats[snapshot.key] = snapshot.val();
   });
 
   firebase.database().ref('users-chats/' + userService.getUser().uid).on('child_changed', function(snapshot) {
-    chats.push(snapshot.val());
-    var add = true;
+    // chats.push(snapshot.val());
+    // var add = true;
 
     angular.forEach(chats, function (chat, key) {
       if (chat.cid == snapshot.key) {
-        add = false;
+        chats[key] = snapshot.val();
+        $localStorage.chats[snapshot.key] = snapshot.val();
+        // add = false;
       }
     });
 
-    if (add) {
-      //add at the beginning
-      chats.unshift(data.val());
-    }
+    // if (add) {
+    //   //add at the beginning
+    //   chats.unshift(data.val());
+    // }
   });
 
   return {
@@ -164,7 +167,7 @@ angular.module('poketin.services', [])
     }
   })
 
-  .factory('userFactory', function () {
+.factory('userFactory', function () {
     var service = this;
 
     service.getUserByUid = function (uid) {
@@ -260,4 +263,23 @@ angular.module('poketin.services', [])
 
 })
 
+  .factory('pokemonFactory', function ($http) {
+    var service = this;
+    var pokemon = {};
+
+    $http.get('locale/pokemon.'+userService.getUser().language+'.json')
+      .then(function(res){
+        pokemon = res.data;
+      });
+
+    service.get = function (id) {
+      return pokemon[id];
+    };
+
+    service.getAll = function () {
+      return pokemon;
+    };
+
+    return service;
+  })
 ;

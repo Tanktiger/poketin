@@ -20,6 +20,10 @@
       "new": "Neuen Chat erstellt"
     },
 
+    "trade": {
+      "new": "Neues Angebot erstellt"
+    },
+
     "logout": "Erfolgreich abgemeldet",
     "login": {
       "error": "Es ist ein Fehler aufgetreten"

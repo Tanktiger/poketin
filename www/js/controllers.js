@@ -40,12 +40,17 @@ angular.module('poketin.controllers', [])
   $scope.checkIfAlreadyMatched = checkIfAlreadyMatched;
   $scope.logout = logout;
   $scope.getChatOverviewDetails = getChatOverviewDetails;
+  $scope.newTradingItem = newTradingItem;
+  $scope.searchForTradingItem = searchForTradingItem;
+  $scope.editOwnTrade = editOwnTrade;
 
   $scope.deviceHeight  = window.innerHeight;
   $scope.user = userService.getUser();
   $scope.myToggle = true;
   $scope.trainers = {};
   $scope.chats = {};
+  $scope.trades = {};
+  $scope.ownTrades = {};
   var cardTypes = [];
 
   $scope.slideIndex = 0;
@@ -90,6 +95,8 @@ angular.module('poketin.controllers', [])
     getNewCards();
     getTrainers();
     getChats();
+    getTradingItems();
+    getOwnTradingItems();
   });
 
 
@@ -873,6 +880,162 @@ angular.module('poketin.controllers', [])
         $scope.chats[chat.cid] = chatOverviewDetails;
         // $scope.chats.unshift(chatOverviewDetails);
       }
+    });
+  }
+
+  function getTradingItems() {
+
+    var lowLat, highLat, lowLong, highLong;
+    var point = new LatLon($scope.user.lastLat, $scope.user.lastLong);
+    var points = {};
+
+    points.north = point.destinationPoint(100000, 0); //100km
+    points.east = point.destinationPoint(100000, 90);//100km
+    points.south = point.destinationPoint(100000, 180);//100km
+    points.west = point.destinationPoint(100000, 270); //100km
+
+    lowLat = point.lat;
+    highLat = point.lat;
+    lowLong = point.lon;
+    highLong = point.lon;
+
+    angular.forEach(points, function (point, dir) {
+      if (lowLat > point.lat ) lowLat = point.lat;
+      if (highLat < point.lat ) highLat = point.lat;
+      if (lowLong > point.lon ) lowLong = point.lon;
+      if (highLong < point.lon ) highLong = point.lon;
+    });
+
+    if (lowLat == undefined) {
+      lowLat = position.coords.latitude - 0.5;
+    }
+    if (highLat == undefined) {
+      highLat = position.coords.latitude + 0.5;
+    }
+    if (lowLong == undefined) {
+      lowLong = position.coords.longitude - 0.5;
+    }
+    if (highLong == undefined) {
+      highLong = position.coords.longitude + 0.5;
+    }
+
+    firebase.database().ref('trades').orderByChild('lat')
+      .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
+        $scope.trades[data.key] = data.val();
+    });
+
+    firebase.database().ref('trades').orderByChild('lat')
+      .startAt(lowLat).endAt(highLat).on('child_changed', function (data) {
+      $scope.trades[data.key] = data.val();
+    });
+
+    firebase.database().ref('trades').orderByChild('long')
+      .startAt(lowLong).endAt(highLong).on('child_added', function (data) {
+      $scope.trades[data.key] = data.val();
+    });
+
+    firebase.database().ref('trades').orderByChild('long')
+      .startAt(lowLong).endAt(highLong).on('child_changed', function (data) {
+      $scope.trades[data.key] = data.val();
+    });
+
+    // firebase.database().ref('trades/').on('child_removed', function (data) {
+    //   delete $scope.trades[data.key];
+    // });
+  }
+
+  function getOwnTradingItems() {
+
+    firebase.database().ref('users-trades/' + $scope.user.uid).on('child_added', function (data) {
+      firebase.database().ref('trades/' + data.key).once('value', function (trade) {
+        $scope.ownTrades[trade.key] = trade.val();
+      });
+    });
+
+    firebase.database().ref('users-trades/' + $scope.user.uid).on('child_removed', function (data) {
+      delete $scope.ownTrades[data.key];
+    });
+  }
+
+  function newTradingItem() {
+    //open modal with form
+    $ionicModal.fromTemplateUrl('templates/modals/new-trading-item.html', {
+      // scope: $scope,
+      animation: 'slide-in-up',
+      hideDelay:920
+    }).then(function(modal, pokemonFactory) {
+      $scope.modalSettings = modal;
+      $scope.modalSettings.show();
+
+      $scope.pokemon = pokemonFactory.getAll();
+      $scope.trade = {};
+
+      $scope.hideSettings = function () {
+        $scope.modalSettings.hide();
+      };
+
+      $scope.createNewTrade = function () {
+        $ionicLoading.show({
+          template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
+        });
+
+        var date = new Date();
+
+        //get new chat id
+        var newTradeId = firebase.database().ref().child('trades').push().key;
+        $scope.trade.id = newTradeId;
+        $scope.trade.date = date.getTime();
+        $scope.trade.creator = $scope.user.uid;
+        $scope.lat = $scope.user.lastLat;
+        $scope.long = $scope.user.lastLong;
+
+        var updates = {};
+        //save chat
+        updates['trades/' + newTradeId] = $scope.trade;
+        //create our chat
+        updates['users-trades/' + $scope.user.uid + '/' + newTradeId] = newTradeId;
+
+        //update all with one call
+        firebase.database().ref().update(updates).then(function () {
+          $scope.modalSettings.hide();
+          $ionicLoading.hide();
+          // $state.go('tab.chat-detail', {'chatId': newChatId});
+          $cordovaToast.show($translate.instant("toasts.trade.new"), "short", "bottom");
+        });
+      };
+    });
+  }
+
+  function editOwnTrade(trade) {
+    //@TODO
+    alert("todo");
+  }
+  function searchForTradingItem() {
+    //open modal with form
+    $ionicModal.fromTemplateUrl('templates/modals/search-trading-item.html', {
+      scope: $scope,
+      animation: 'slide-in-up',
+      hideDelay:920
+    }).then(function(modal, pokemonFactory) {
+      $scope.modalSettings = modal;
+      $scope.modalSettings.show();
+
+      $scope.pokemon = pokemonFactory.getAll();
+      $scope.search = {};
+
+      $scope.hideSettings = function () {
+        $scope.modalSettings.hide();
+      };
+
+      $scope.searchForTrades = function () {
+        $ionicLoading.show({
+          template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
+        });
+        firebase.database().ref('trades').orderByChild('lat')
+          .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
+          $scope.trades[data.key] = data.val();
+        });
+      };
     });
   }
 })

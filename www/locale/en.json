@@ -1,7 +1,8 @@
 {
   "button": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search": "Search"
   },
 
   "toasts": {
@@ -18,6 +19,10 @@
 
     "chat": {
       "new": "Started new Chat"
+    },
+
+    "trade": {
+      "new": "Created new Trade"
     },
 
     "logout": "Successfull logout",
@@ -89,5 +94,18 @@
 
   "card": {
     "level": "Level"
+  },
+
+  "trades": {
+    "new": {
+      "title": "Create new Trade"
+    },
+
+    "label": {
+      "pokemon": "Pokemon",
+      "cp": "CP",
+      "size": "Size",
+      "text": "What do you want?"
+    }
   }
 }

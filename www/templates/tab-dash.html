@@ -4,11 +4,18 @@
         <div class="buttons" ng-click="slideTo(0)">
           <button class="button button-clear icon ion-person animated {{slideIndex == 0 ? 'color-' + user.team : 'color-gray'}}"></button>
         </div>
-        <h1 class="title {{slideIndex ==1 ? 'color-' + user.team  : 'color-gray'}}" ng-click="slideTo(1)">
-          POKETIN
-        </h1>
+        <div class="buttons" ng-click="slideTo(1)">
+          <button class="button button-clear icon ion-planet animated {{slideIndex == 2 ? 'color-' + user.team  : 'color-gray'}}"></button>
+        </div>
         <div class="buttons" ng-click="slideTo(2)">
             <button class="button button-clear icon ion-chatbubbles animated {{slideIndex == 2 ? 'color-' + user.team  : 'color-gray'}}"></button>
+        </div>
+        <div class="buttons" ng-click="slideTo(3)">
+          <button class="button button-clear icon ion-hand animated {{slideIndex == 3 ? 'color-' + user.team  : 'color-gray'}}"></button>
+        </div>
+
+        <div class="buttons" ng-click="slideTo(4)">
+          <button class="button button-clear icon ion-bag animated {{slideIndex == 3 ? 'color-' + user.team  : 'color-gray'}}"></button>
         </div>
 
       </ion-header-bar>
@@ -118,7 +125,7 @@
     </ion-slide>
 
     <!-- chat slide -->
-    <ion-slide on-drag-left="onTouch()" on-drag-right="onRelease()">
+    <ion-slide >
       <ion-content>
 
         <button class="button button-fab button-fab-bottom-right button-balanced-900 pane"
@@ -136,6 +143,58 @@
               <p class=" color-gray">{{chat.lastMessage}}</p>
               <hr class="item-hr">
             </ion-item>
+        </ion-list>
+
+      </ion-content>
+    </ion-slide>
+
+    <!-- own trading items slide -->
+    <ion-slide >
+      <ion-content>
+
+        <button class="button button-fab button-fab-bottom-right button-balanced-900 pane"
+                nav-view="active" ng-click="newTradingItem()" style="bottom: 25px;opacity: 1; transform: translate3d(0%, 0px, 0px);">
+          <i class="icon ion-plus"></i>
+        </button>
+
+        <ion-list ng-if="ownTrades" can-swipe="true">
+          <ion-item class="item-light item-text-wrap item-avatar item-borderless item-icon-right"
+                    data-ng-repeat="item in ownTrades"
+                    style="overflow:hidden;" ui-sref="tab.trade-detail({'tradeId': item.id})"
+                    id="{{item.id}}">
+
+            <img ng-src="img/3d/{{item.pokemon}}.png">
+            <h2 class="capitalize font-120">CP: {{item.cp}} - Size: {{item.size}}</h2>
+            <p class=" color-gray" am-time-ago="item.createDate"></p>
+            <ion-option-button class="button-info" ng-click="editOwnTrade(item)">
+              <i class="icon ion-edit"></i>
+            </ion-option-button>
+            <hr class="item-hr">
+          </ion-item>
+        </ion-list>
+
+      </ion-content>
+    </ion-slide>
+
+    <!-- marketplace slide -->
+    <ion-slide on-drag-left="onTouch()" on-drag-right="onRelease()">
+      <ion-content>
+
+        <button class="button button-fab button-fab-bottom-right button-balanced-900 pane"
+                nav-view="active" ng-click="searchForTradingItem()" style="bottom: 25px;opacity: 1; transform: translate3d(0%, 0px, 0px);">
+          <i class="icon ion-search"></i>
+        </button>
+
+        <ion-list ng-if="trades">
+          <ion-item class="item-light item-text-wrap item-avatar item-borderless item-icon-right"
+                    data-ng-repeat="item in trades"
+                    style="overflow:hidden;" ui-sref="tab.trade-detail({'tradeId': item.id})"
+                    id="{{item.id}}">
+            <img ng-src="img/3d/{{item.pokemon}}.png">
+            <h2 class="capitalize font-120">CP: {{item.cp}} - Size: {{item.size}}</h2>
+            <p class=" color-gray" am-time-ago="item.createDate"></p>
+            <hr class="item-hr">
+          </ion-item>
         </ion-list>
 
       </ion-content>
