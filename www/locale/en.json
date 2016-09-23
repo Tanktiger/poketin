@@ -22,7 +22,9 @@
     },
 
     "trade": {
-      "new": "Created new Trade"
+      "new": "Created new Trade",
+      "update": "Trade updated",
+      "delete": "Trade deleted"
     },
 
     "logout": "Successfull logout",
@@ -105,7 +107,8 @@
       "pokemon": "Pokemon",
       "cp": "CP",
       "size": "Size",
-      "text": "What do you want?"
+      "text": "What do you want?",
+      "distance": "Distance"
     }
   }
 }

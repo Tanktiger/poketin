@@ -17,7 +17,10 @@
               {{ "trades.label.pokemon"|translate }}
             </span>
             <select ng-model="trade.pokemon">
-              <option value="{{id}}" ng-repeat="id, name in pokemon">{{ name }}</option>
+              <option value="{{id}}" ng-repeat="id, name in pokemon">
+                <img ng-src="img/3d/{{id}}.png">
+                {{ name }}
+              </option>
             </select>
           </label>
           <br>

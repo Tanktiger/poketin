@@ -22,22 +22,25 @@ Idee: trade-offers für das was man zum tausch anbieten kann
 - [ ] sharing im chat integrieren (Bilder, Videos, Location)
 - [ ] Marktplatz
 - [x] Anzeige von eigenen Trades
-- [x] Anzeige von allen Trades
-- [ ] Suche nach Trades - anzeige aller trades anpassen - im ersten schritt suche nur in lokalen trades?
+- [ ] Anzeige von allen Trades - letzten 100 nach date und dann nachladen per infinite scroll - ausser filter ist aktiv
+- [ ] Suche nach Trades - im modal filter öffnen - dann verändern der angezeigten Trades
+- [ ] zwischenspeichern von Trades im localstorage und auf child_changed und child_removed achten - anlegen eines services?
 - [x] erstellen eines Trades
 - [ ] editieren von Trades
 - [ ] detailansicht von Trades
 - [ ] Tauschabwicklung
 - [ ] Pokemon select mit Bildern versehen
-- [ ] Code optimieren
 - [ ] Hintergrund bei den Karten - Bilder auf Weiß setzen
-- [ ] Poketin Logo
+- [ ] alle dates zu firebase server timestamp umbauen
 
 #RC2
 
+- [ ] Poketin Logo
+- [ ] Einstellen ob man KM oder Miles will
 - [ ] Pokemon DB
 - [ ] Pokemon Team im Profil ergänzen (max 6 Pokemon)
 - [ ] Anzeige der Reichweite bis zum Match
+- [ ] Code optimieren
 
 #RC3
 

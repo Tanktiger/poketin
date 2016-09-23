@@ -21,6 +21,7 @@ angular.module('poketin.controllers', [])
                                  , $translate
                                  , $cordovaImagePicker
                                  , $templateCache
+                                 , tradeService
 
 ) {
 
@@ -43,6 +44,8 @@ angular.module('poketin.controllers', [])
   $scope.newTradingItem = newTradingItem;
   $scope.searchForTradingItem = searchForTradingItem;
   $scope.editOwnTrade = editOwnTrade;
+  $scope.checkIfMoreTradesCanBeLoaded = checkIfMoreTradesCanBeLoaded();
+  $scope.loadMoreTrades = loadMoreTrades();
 
   $scope.deviceHeight  = window.innerHeight;
   $scope.user = userService.getUser();
@@ -91,12 +94,14 @@ angular.module('poketin.controllers', [])
       }
     }
   );
+
   $scope.$on('$ionicView.enter', function(e) {
     getNewCards();
     getTrainers();
     getChats();
-    getTradingItems();
-    getOwnTradingItems();
+
+    $scope.trades = tradeService.getTrades();
+    $scope.ownTrades = tradeService.getOwnTrades();
   });
 
 
@@ -883,87 +888,13 @@ angular.module('poketin.controllers', [])
     });
   }
 
-  function getTradingItems() {
-
-    var lowLat, highLat, lowLong, highLong;
-    var point = new LatLon($scope.user.lastLat, $scope.user.lastLong);
-    var points = {};
-
-    points.north = point.destinationPoint(100000, 0); //100km
-    points.east = point.destinationPoint(100000, 90);//100km
-    points.south = point.destinationPoint(100000, 180);//100km
-    points.west = point.destinationPoint(100000, 270); //100km
-
-    lowLat = point.lat;
-    highLat = point.lat;
-    lowLong = point.lon;
-    highLong = point.lon;
-
-    angular.forEach(points, function (point, dir) {
-      if (lowLat > point.lat ) lowLat = point.lat;
-      if (highLat < point.lat ) highLat = point.lat;
-      if (lowLong > point.lon ) lowLong = point.lon;
-      if (highLong < point.lon ) highLong = point.lon;
-    });
-
-    if (lowLat == undefined) {
-      lowLat = position.coords.latitude - 0.5;
-    }
-    if (highLat == undefined) {
-      highLat = position.coords.latitude + 0.5;
-    }
-    if (lowLong == undefined) {
-      lowLong = position.coords.longitude - 0.5;
-    }
-    if (highLong == undefined) {
-      highLong = position.coords.longitude + 0.5;
-    }
-
-    firebase.database().ref('trades').orderByChild('lat')
-      .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
-        $scope.trades[data.key] = data.val();
-    });
-
-    firebase.database().ref('trades').orderByChild('lat')
-      .startAt(lowLat).endAt(highLat).on('child_changed', function (data) {
-      $scope.trades[data.key] = data.val();
-    });
-
-    firebase.database().ref('trades').orderByChild('long')
-      .startAt(lowLong).endAt(highLong).on('child_added', function (data) {
-      $scope.trades[data.key] = data.val();
-    });
-
-    firebase.database().ref('trades').orderByChild('long')
-      .startAt(lowLong).endAt(highLong).on('child_changed', function (data) {
-      $scope.trades[data.key] = data.val();
-    });
-
-    // firebase.database().ref('trades/').on('child_removed', function (data) {
-    //   delete $scope.trades[data.key];
-    // });
-  }
-
-  function getOwnTradingItems() {
-
-    firebase.database().ref('users-trades/' + $scope.user.uid).on('child_added', function (data) {
-      firebase.database().ref('trades/' + data.key).once('value', function (trade) {
-        $scope.ownTrades[trade.key] = trade.val();
-      });
-    });
-
-    firebase.database().ref('users-trades/' + $scope.user.uid).on('child_removed', function (data) {
-      delete $scope.ownTrades[data.key];
-    });
-  }
-
   function newTradingItem() {
     //open modal with form
     $ionicModal.fromTemplateUrl('templates/modals/new-trading-item.html', {
       // scope: $scope,
       animation: 'slide-in-up',
       hideDelay:920
-    }).then(function(modal, pokemonFactory) {
+    }).then(function(modal, pokemonFactory, $scope, tradeService) {
       $scope.modalSettings = modal;
       $scope.modalSettings.show();
 
@@ -975,33 +906,7 @@ angular.module('poketin.controllers', [])
       };
 
       $scope.createNewTrade = function () {
-        $ionicLoading.show({
-          template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
-        });
-
-        var date = new Date();
-
-        //get new chat id
-        var newTradeId = firebase.database().ref().child('trades').push().key;
-        $scope.trade.id = newTradeId;
-        $scope.trade.date = date.getTime();
-        $scope.trade.creator = $scope.user.uid;
-        $scope.lat = $scope.user.lastLat;
-        $scope.long = $scope.user.lastLong;
-
-        var updates = {};
-        //save chat
-        updates['trades/' + newTradeId] = $scope.trade;
-        //create our chat
-        updates['users-trades/' + $scope.user.uid + '/' + newTradeId] = newTradeId;
-
-        //update all with one call
-        firebase.database().ref().update(updates).then(function () {
-          $scope.modalSettings.hide();
-          $ionicLoading.hide();
-          // $state.go('tab.chat-detail', {'chatId': newChatId});
-          $cordovaToast.show($translate.instant("toasts.trade.new"), "short", "bottom");
-        });
+        tradeService.newTrade($scope.trade);
       };
     });
   }
@@ -1010,6 +915,7 @@ angular.module('poketin.controllers', [])
     //@TODO
     alert("todo");
   }
+
   function searchForTradingItem() {
     //open modal with form
     $ionicModal.fromTemplateUrl('templates/modals/search-trading-item.html', {
@@ -1021,22 +927,35 @@ angular.module('poketin.controllers', [])
       $scope.modalSettings.show();
 
       $scope.pokemon = pokemonFactory.getAll();
-      $scope.search = {};
+      $scope.search = {
+        "pokemon": null,
+        "cp": 0,
+        "distance": 300
+      };
 
       $scope.hideSettings = function () {
         $scope.modalSettings.hide();
       };
 
       $scope.searchForTrades = function () {
+        //@TODO search im localstorage speichern um beim neustart der app den suchfilter zu behalten
         $ionicLoading.show({
           template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
         });
-        firebase.database().ref('trades').orderByChild('lat')
-          .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
-          $scope.trades[data.key] = data.val();
-        });
+        // firebase.database().ref('trades').orderByChild('lat')
+        //   .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
+        //   $scope.trades[data.key] = data.val();
+        // });
       };
     });
+  }
+
+  function checkIfMoreTradesCanBeLoaded() {
+    //@TODO: hier die nächsten 50 laden
+  }
+
+  function loadMoreTrades() {
+    //@TODO: hier die nächsten 50 in $scope.trades schreiben
   }
 })
 
