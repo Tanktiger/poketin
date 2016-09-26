@@ -33,7 +33,7 @@
 
           <label class="item item-input item-floating-label">
             <span class="input-label bold">{{ "trades.label.distance"|translate }}</span>
-            <input type="number" min="1" max="10000" ng-model="search.distance" placeholder="100">
+            <input type="number" min="1" max="1000" ng-model="search.distance" placeholder="100">
           </label>
           <br>
           <button class="button button-block button-calm ink" ng-click="searchForTrades()" data-ink-color="#9DEAFF" data-ink-opacity="1">
@@ -41,17 +41,7 @@
           </button>
         </div>
 
-      <ion-list ng-if="searchTrades">
-        <ion-item class="item-light item-text-wrap item-avatar item-borderless item-icon-right"
-                  data-ng-repeat="item in trades"
-                  style="overflow:hidden;" ui-sref="tab.trade-detail({'tradeId': item.id})"
-                  id="{{item.id}}">
-          <img ng-src="img/3d/{{item.pokemon}}.png">
-          <h2 class="capitalize font-120">CP: {{item.cp}} - Size: {{item.size}}</h2>
-          <p class=" color-gray" am-time-ago="item.createDate"></p>
-          <hr class="item-hr">
-        </ion-item>
-      </ion-list>
+
     </div>
   </ion-content>
 </ion-modal-view>

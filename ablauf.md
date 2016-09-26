@@ -12,19 +12,19 @@
 - [x] Beim profile complete ein Standardbild setzen wenn es kein Profilbild gibt!
 
 #RC1
-Idee: trade-offers für das was man zum tausch anbieten kann
-- kann man auch angebote abgeben? Sowas wie ich tausche mine 500 cp garados obwohl du ein 1000 cp willst? - nein am anfang nicht
+
 - [ ] register check einbauen und gucken ob nickname nicht schon verwendet wird
 - [ ] existing mail info bei reg einbauen
 - [ ] Profilbild mit Bilder aus Galerie - dann zuschneiden
 - [x] Admob integrieren
 - [ ] zwischenspeichern von userdaten im localstorage (matches, likes, chats)
 - [ ] sharing im chat integrieren (Bilder, Videos, Location)
+
 - [ ] Marktplatz
 - [x] Anzeige von eigenen Trades
 - [ ] Anzeige von allen Trades - letzten 100 nach date und dann nachladen per infinite scroll - ausser filter ist aktiv
 - [ ] Suche nach Trades - im modal filter öffnen - dann verändern der angezeigten Trades
-- [ ] zwischenspeichern von Trades im localstorage und auf child_changed und child_removed achten - anlegen eines services?
+- [ ] zwischenspeichern von Trades im localstorage und auf child_changed und child_removed achten - anlegen eines services
 - [x] erstellen eines Trades
 - [ ] editieren von Trades
 - [ ] detailansicht von Trades

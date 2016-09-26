@@ -285,8 +285,8 @@ angular.module('poketin.services', [])
 
   .service('tradeService', function ($ionicLoading, $cordovaToast, $translate, userService, $localStorage) {
     var service = this;
-    service.trades = {};
-    service.ownTrades = {};
+    service.trades = [];
+    service.ownTrades = [];
     service.search = {
       "pokemon": null,
       "cp": 0,
@@ -294,9 +294,7 @@ angular.module('poketin.services', [])
     };
 
     //load the trading items - first from storage and then from firebase
-    loadFromStorage();
-    getOwnTradingItems();
-    getTradingItems();
+    init();
 
     service.setTrade = function (trade) {
       if (trade.id) {
@@ -353,8 +351,15 @@ angular.module('poketin.services', [])
         template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
       });
       firebase.database().ref('trades/' + id).remove().then(function () {
-        delete service.trades[id];
-        delete service.ownTrades[id];
+        if (service.trades[id] && service.trades[id].length > 0) {
+          delete service.trades[id];
+          delete $localStorage.trades[id];
+        }
+        if (service.ownTrades[id] && service.ownTrades[id].length > 0) {
+          delete service.ownTrades[id];
+          delete $localStorage.ownTrades[id];
+        }
+
         $cordovaToast.show($translate.instant("toasts.trade.delete"), "long", "bottom");
         $ionicLoading.hide();
       });
@@ -391,17 +396,83 @@ angular.module('poketin.services', [])
       });
     };
 
+    function init() {
+      loadFromStorage();
+      getOwnTradingItems();
+      getTradingItems();
+    }
+
     function getTradingItems () {
+      var tradesRef = firebase.database().ref('trades');
+      var user = userService.getUser();
+      //first remove oldListener - childs must be removed extra
+      tradesRef.off('child_added');
+      tradesRef.off('child_changed');
+      tradesRef.off('child_removed');
+      tradesRef.orderByChild('lat').off('child_added');
+      tradesRef.orderByChild('long').off('child_added');
+      tradesRef.orderByChild('lat').off('child_changed');
+      tradesRef.orderByChild('long').off('child_changed');
 
-      firebase.database().ref('trades').orderByChild('date').limitToLast(100).on('child_added', function (data) {
+      //@TODO: berechnung in factory auslagern
+      var lowLat, highLat, lowLong, highLong;
+      var point = new LatLon(user.lastLat, user.lastLong);
+      var points = {};
+
+      points.north = point.destinationPoint(100000, 0); //100km
+      points.east = point.destinationPoint(100000, 90);//100km
+      points.south = point.destinationPoint(100000, 180);//100km
+      points.west = point.destinationPoint(100000, 270); //100km
+
+      lowLat = point.lat;
+      highLat = point.lat;
+      lowLong = point.lon;
+      highLong = point.lon;
+
+      angular.forEach(points, function (point, dir) {
+        if (lowLat > point.lat ) lowLat = point.lat;
+        if (highLat < point.lat ) highLat = point.lat;
+        if (lowLong > point.lon ) lowLong = point.lon;
+        if (highLong < point.lon ) highLong = point.lon;
+      });
+
+
+      if (lowLat == undefined) {
+        lowLat = position.coords.latitude - 0.5;
+      }
+      if (highLat == undefined) {
+        highLat = position.coords.latitude + 0.5;
+      }
+      if (lowLong == undefined) {
+        lowLong = position.coords.longitude - 0.5;
+      }
+      if (highLong == undefined) {
+        highLong = position.coords.longitude + 0.5;
+      }
+
+      tradesRef.orderByChild('lat')
+        .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
+        service.setTrade(data.val());
+      });
+      tradesRef.orderByChild('long')
+        .startAt(lowLong).endAt(highLong).on('child_added', function (data) {
         service.setTrade(data.val());
       });
 
-      firebase.database().ref('trades').on('child_changed', function (data) {
+      tradesRef.orderByChild('lat')
+        .startAt(lowLat).endAt(highLat).on('child_changed', function (data) {
+        service.setTrade(data.val());
+      });
+      tradesRef.orderByChild('long')
+        .startAt(lowLong).endAt(highLong).on('child_changed', function (data) {
         service.setTrade(data.val());
       });
 
-      firebase.database().ref('trades').on('child_removed', function (data) {
+      // tradesRef.on('child_changed', function (data) {
+      //   service.setTrade(data.val());
+      // });
+
+      tradesRef.on('child_removed', function (data) {
         service.removeTrade(data.key);
       });
     }
@@ -424,4 +495,4 @@ angular.module('poketin.services', [])
     }
   })
 
-;
+;//end of services

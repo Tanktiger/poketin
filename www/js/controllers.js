@@ -52,9 +52,23 @@ angular.module('poketin.controllers', [])
   $scope.myToggle = true;
   $scope.trainers = {};
   $scope.chats = {};
-  $scope.trades = {};
-  $scope.ownTrades = {};
+  $scope.ownTrades = [];
   var cardTypes = [];
+  $scope.cards = {
+    master: cardTypes,
+    active: cardTypes,
+    discards: [],
+    liked: [],
+    disliked: [],
+    visible: null
+  };
+  $scope.trades = {
+    master: [],
+    active: [],
+    // hidden: [],
+    // liked: [],
+    // disliked: []
+  };
 
   $scope.slideIndex = 0;
 
@@ -88,7 +102,7 @@ angular.module('poketin.controllers', [])
     function(newValue, oldValue) {
       switch(newValue) {
         case 0:
-        case 2:
+        case 4:
           $ionicSlideBoxDelegate.enableSlide(false);
           break;
       }
@@ -100,7 +114,10 @@ angular.module('poketin.controllers', [])
     getTrainers();
     getChats();
 
-    $scope.trades = tradeService.getTrades();
+    $scope.trades.master = tradeService.getTrades();
+    if ($scope.trades.active.length == 0) {
+      $scope.trades.active = Array.prototype.slice.call($scope.trades.master, 0);
+    }
     $scope.ownTrades = tradeService.getOwnTrades();
   });
 
@@ -118,15 +135,6 @@ angular.module('poketin.controllers', [])
       updateUserPositionTimer = undefined;
     }
   });
-
-  $scope.cards = {
-    master: cardTypes,
-    active: cardTypes,
-    discards: [],
-    liked: [],
-    disliked: [],
-    visible: null
-  };
 
   $scope.cardDestroyed = function(index) {
     $scope.cards.active.splice(index, 1);
@@ -907,6 +915,7 @@ angular.module('poketin.controllers', [])
 
       $scope.createNewTrade = function () {
         tradeService.newTrade($scope.trade);
+        //@TODO modal schließen und ladebildschirm anzeigen
       };
     });
   }
@@ -942,20 +951,19 @@ angular.module('poketin.controllers', [])
         $ionicLoading.show({
           template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
         });
-        // firebase.database().ref('trades').orderByChild('lat')
-        //   .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
-        //   $scope.trades[data.key] = data.val();
-        // });
+
       };
     });
   }
 
   function checkIfMoreTradesCanBeLoaded() {
     //@TODO: hier die nächsten 50 laden
+    $scope.trades.master = tradeService.getTrades();
   }
 
   function loadMoreTrades() {
     //@TODO: hier die nächsten 50 in $scope.trades schreiben
+    $scope.trades.active = Array.prototype.slice.call($scope.trades.master, 0);
   }
 })
 
