@@ -44,8 +44,9 @@ angular.module('poketin.controllers', [])
   $scope.newTradingItem = newTradingItem;
   $scope.searchForTradingItem = searchForTradingItem;
   $scope.editOwnTrade = editOwnTrade;
-  $scope.checkIfMoreTradesCanBeLoaded = checkIfMoreTradesCanBeLoaded();
-  $scope.loadMoreTrades = loadMoreTrades();
+  $scope.checkIfMoreTradesCanBeLoaded = checkIfMoreTradesCanBeLoaded;
+  $scope.loadMoreTrades = loadMoreTrades;
+  $scope.showTrade = showTrade;
 
   $scope.deviceHeight  = window.innerHeight;
   $scope.user = userService.getUser();
@@ -767,6 +768,7 @@ angular.module('poketin.controllers', [])
       }
     });
   }
+
   function addPhoto() {
     var options = {
       quality : 75,
@@ -921,8 +923,27 @@ angular.module('poketin.controllers', [])
   }
 
   function editOwnTrade(trade) {
-    //@TODO
-    alert("todo");
+    //open modal with form
+    $ionicModal.fromTemplateUrl('templates/modals/edit-trading-item.html', {
+      // scope: $scope,
+      animation: 'slide-in-up',
+      hideDelay:920
+    }).then(function(modal, pokemonFactory, $scope, tradeService) {
+      $scope.modalSettings = modal;
+      $scope.modalSettings.show();
+
+      $scope.pokemon = pokemonFactory.getAll();
+      $scope.trade = trade;
+
+      $scope.hideSettings = function () {
+        $scope.modalSettings.hide();
+      };
+
+      $scope.updateTrade = function () {
+        tradeService.updateTrade($scope.trade);
+        //@TODO modal schließen und ladebildschirm anzeigen
+      };
+    });
   }
 
   function searchForTradingItem() {
@@ -931,27 +952,23 @@ angular.module('poketin.controllers', [])
       scope: $scope,
       animation: 'slide-in-up',
       hideDelay:920
-    }).then(function(modal, pokemonFactory) {
+    }).then(function(modal, pokemonFactory, tradeService) {
       $scope.modalSettings = modal;
       $scope.modalSettings.show();
 
       $scope.pokemon = pokemonFactory.getAll();
-      $scope.search = {
-        "pokemon": null,
-        "cp": 0,
-        "distance": 300
-      };
+      $scope.search = tradeService.search;
 
       $scope.hideSettings = function () {
         $scope.modalSettings.hide();
       };
 
       $scope.searchForTrades = function () {
-        //@TODO search im localstorage speichern um beim neustart der app den suchfilter zu behalten
+        tradeService.search = $scope.search;
         $ionicLoading.show({
           template: '<div class="loader"><svg class="circular"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div>'
         });
-
+        tradeService.startSearch();
       };
     });
   }
@@ -964,6 +981,32 @@ angular.module('poketin.controllers', [])
   function loadMoreTrades() {
     //@TODO: hier die nächsten 50 in $scope.trades schreiben
     $scope.trades.active = Array.prototype.slice.call($scope.trades.master, 0);
+  }
+
+  function showTrade(trade) {
+    //@TODO mit leben füllen
+    //open modal with form
+    $ionicModal.fromTemplateUrl('templates/modals/show-trade.html', {
+      // scope: $scope,
+      animation: 'slide-in-up',
+      hideDelay:920
+    }).then(function(modal, pokemonFactory, $scope, tradeService) {
+      $scope.modalSettings = modal;
+      $scope.modalSettings.show();
+
+      $scope.pokemon = pokemonFactory.getAll();
+      $scope.trade = trade;
+
+      $scope.hideSettings = function () {
+        $scope.modalSettings.hide();
+      };
+
+      /**
+       * Funktionen zum bewerben für den Tausch und zum zurückziehen der Bewerbung
+       * apply and disapply
+       * Der TradeOwner kann dann in seinen Trades die Bewerber sehen und dann einen akzeptieren.
+       */
+    });
   }
 })
 
@@ -1026,11 +1069,11 @@ angular.module('poketin.controllers', [])
     });
 
     $scope.$on('$ionicView.enter', function() {
-      console.log('UserMessages $ionicView.enter');
+      // console.log('UserMessages $ionicView.enter');
     });
 
     $scope.$on('$ionicView.leave', function() {
-      console.log('leaving UserMessages view, destroying interval');
+      // console.log('leaving UserMessages view, destroying interval');
     });
 
     $scope.$on('$ionicView.beforeLeave', function() {
@@ -1071,8 +1114,8 @@ angular.module('poketin.controllers', [])
     }
 
     $scope.onMessageHold = function(e, itemIndex, message) {
-      console.log('onMessageHold');
-      console.log('message: ' + JSON.stringify(message, null, 2));
+      // console.log('onMessageHold');
+      // console.log('message: ' + JSON.stringify(message, null, 2));
       $ionicActionSheet.show({
         buttons: [{
           text: 'Copy Text'
@@ -1146,7 +1189,7 @@ angular.module('poketin.controllers', [])
     function listeningForMessages() {
       messagesRef.limitToLast(100).on('child_added', function (snapshot) {
         if (intialMessagesLoaded) {
-          console.log(snapshot.val());
+          // console.log(snapshot.val());
           displayMessage(snapshot);
           $timeout(function() {
             viewScroll.scrollBottom(true);

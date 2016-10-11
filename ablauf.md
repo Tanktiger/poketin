@@ -13,12 +13,8 @@
 
 #RC1
 
-- [ ] register check einbauen und gucken ob nickname nicht schon verwendet wird
-- [ ] existing mail info bei reg einbauen
-- [ ] Profilbild mit Bilder aus Galerie - dann zuschneiden
 - [x] Admob integrieren
 - [ ] zwischenspeichern von userdaten im localstorage (matches, likes, chats)
-- [ ] sharing im chat integrieren (Bilder, Videos, Location)
 
 - [ ] Marktplatz
 - [x] Anzeige von eigenen Trades
@@ -28,6 +24,7 @@
 - [x] erstellen eines Trades
 - [ ] editieren von Trades
 - [ ] detailansicht von Trades
+- [ ] Tradeservice mit promises realisieren
 - [ ] Tauschabwicklung
 - [ ] Pokemon select mit Bildern versehen
 - [ ] Hintergrund bei den Karten - Bilder auf Weiß setzen
@@ -35,12 +32,17 @@
 
 #RC2
 
+- [ ] register check einbauen und gucken ob nickname nicht schon verwendet wird
+- [ ] existing mail info bei reg einbauen
+- [ ] Profilbild mit Bilder aus Galerie - dann zuschneiden
+- [ ] Pushmitteilungen integrieren
 - [ ] Poketin Logo
 - [ ] Einstellen ob man KM oder Miles will
 - [ ] Pokemon DB
 - [ ] Pokemon Team im Profil ergänzen (max 6 Pokemon)
 - [ ] Anzeige der Reichweite bis zum Match
 - [ ] Code optimieren
+- [ ] sharing im chat integrieren (Bilder, Videos, Location)
 
 #RC3
 

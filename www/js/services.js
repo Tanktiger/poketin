@@ -298,7 +298,9 @@ angular.module('poketin.services', [])
 
     service.setTrade = function (trade) {
       if (trade.id) {
-        service.trades[trade.id] = trade;
+        if (checkIfTradePassSearch(trade)) {
+          service.trades[trade.id] = trade;
+        }
         $localStorage.trades[trade.id] = trade;
       }
       return this;
@@ -396,6 +398,13 @@ angular.module('poketin.services', [])
       });
     };
 
+    service.startSearch = function () {
+      //@todo return promise um an anderen Stellen darauf warten zu können
+      //erst im localstorage suchen und dann auf firebase
+      service.trades = filterTrades($localStorage.trades);
+      getTradingItems();
+    };
+
     function init() {
       loadFromStorage();
       getOwnTradingItems();
@@ -404,7 +413,6 @@ angular.module('poketin.services', [])
 
     function getTradingItems () {
       var tradesRef = firebase.database().ref('trades');
-      var user = userService.getUser();
       //first remove oldListener - childs must be removed extra
       tradesRef.off('child_added');
       tradesRef.off('child_changed');
@@ -414,15 +422,101 @@ angular.module('poketin.services', [])
       tradesRef.orderByChild('lat').off('child_changed');
       tradesRef.orderByChild('long').off('child_changed');
 
+      var points = calculateLowAndHighPoints();
+
+      tradesRef.orderByChild('lat')
+        .startAt(points.lowLat).endAt(points.highLat).on('child_added', function (data) {
+        service.setTrade(data.val());
+      });
+      tradesRef.orderByChild('long')
+        .startAt(points.lowLong).endAt(points.highLong).on('child_added', function (data) {
+        service.setTrade(data.val());
+      });
+
+      tradesRef.orderByChild('lat')
+        .startAt(points.lowLat).endAt(points.highLat).on('child_changed', function (data) {
+        service.setTrade(data.val());
+      });
+      tradesRef.orderByChild('long')
+        .startAt(points.lowLong).endAt(points.highLong).on('child_changed', function (data) {
+        service.setTrade(data.val());
+      });
+
+      // tradesRef.on('child_changed', function (data) {
+      //   service.setTrade(data.val());
+      // });
+
+      tradesRef.on('child_removed', function (data) {
+        service.removeTrade(data.key);
+      });
+    }
+
+    function getOwnTradingItems () {
+      if (firebase.auth() && firebase.auth().currentUser) {
+        firebase.database().ref('trades').orderByChild("author").equalTo(firebase.auth().currentUser.uid).on('child_added', function (trade) {
+          service.setOwnTrade(trade.val());
+        });
+
+        firebase.database().ref('trades').orderByChild("author").equalTo(firebase.auth().currentUser.uid).on('child_changed', function (trade) {
+          service.setOwnTrade(trade.val());
+        });
+      }
+    }
+
+    function loadFromStorage() {
+      service.trades = filterTrades($localStorage.trades);
+      service.ownTrades = $localStorage.ownTrades;
+    }
+
+    function filterTrades(trades) {
+      //@TODO: promise?
+      var result = [];
+      angular.forEach(trades, function (trade, key) {
+        if (checkIfTradePassSearch(trade)) {
+          result.push(trade);
+        }
+      });
+
+      return result;
+    }
+
+    function checkIfTradePassSearch(trade) {
+      //@TODO: promise?
+      var points = calculateLowAndHighPoints();
+      var add = false;
+
+      //distance check
+      if (trade.lat >= points.lowLat && trade.lat <= points.highLat) {
+        add = true;
+      }
+      if (trade.long >= points.lowLong && trade.long <= points.highLong) {
+        add = true;
+      }
+
+      //pokemon check
+      if (service.search.pokemon) {
+        add = (service.search.pokemon == trade.pokemon);
+      }
+
+      //cp check
+      if (service.search.cp != 0) {
+        add = (service.search.cp <= trade.cp);
+      }
+
+      return add;
+    }
+
+    function calculateLowAndHighPoints() {
       //@TODO: berechnung in factory auslagern
+      var user = userService.getUser();
       var lowLat, highLat, lowLong, highLong;
       var point = new LatLon(user.lastLat, user.lastLong);
       var points = {};
 
-      points.north = point.destinationPoint(100000, 0); //100km
-      points.east = point.destinationPoint(100000, 90);//100km
-      points.south = point.destinationPoint(100000, 180);//100km
-      points.west = point.destinationPoint(100000, 270); //100km
+      points.north = point.destinationPoint(service.search.distance, 0); //100km
+      points.east = point.destinationPoint(service.search.distance, 90);//100km
+      points.south = point.destinationPoint(service.search.distance, 180);//100km
+      points.west = point.destinationPoint(service.search.distance, 270); //100km
 
       lowLat = point.lat;
       highLat = point.lat;
@@ -450,48 +544,12 @@ angular.module('poketin.services', [])
         highLong = position.coords.longitude + 0.5;
       }
 
-      tradesRef.orderByChild('lat')
-        .startAt(lowLat).endAt(highLat).on('child_added', function (data) {
-        service.setTrade(data.val());
-      });
-      tradesRef.orderByChild('long')
-        .startAt(lowLong).endAt(highLong).on('child_added', function (data) {
-        service.setTrade(data.val());
-      });
-
-      tradesRef.orderByChild('lat')
-        .startAt(lowLat).endAt(highLat).on('child_changed', function (data) {
-        service.setTrade(data.val());
-      });
-      tradesRef.orderByChild('long')
-        .startAt(lowLong).endAt(highLong).on('child_changed', function (data) {
-        service.setTrade(data.val());
-      });
-
-      // tradesRef.on('child_changed', function (data) {
-      //   service.setTrade(data.val());
-      // });
-
-      tradesRef.on('child_removed', function (data) {
-        service.removeTrade(data.key);
-      });
-    }
-
-    function getOwnTradingItems () {
-      if (firebase.auth() && firebase.auth().currentUser) {
-        firebase.database().ref('trades').orderByChild("author").equalTo(firebase.auth().currentUser.uid).on('child_added', function (trade) {
-          service.setOwnTrade(trade.val());
-        });
-
-        firebase.database().ref('trades').orderByChild("author").equalTo(firebase.auth().currentUser.uid).on('child_changed', function (trade) {
-          service.setOwnTrade(trade.val());
-        });
+      return {
+        lowLat: lowLat,
+        highLat: highLat,
+        lowLong: lowLong,
+        highLong: highLong
       }
-    }
-
-    function loadFromStorage () {
-      service.trades = $localStorage.trades;
-      service.ownTrades = $localStorage.ownTrades;
     }
   })
 
